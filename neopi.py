@@ -28,7 +28,38 @@ from optparse import OptionParser
 # Smallest filesize to checkfor in bytes.  
 SMALLEST = 60
 
-class LanguageIC:
+#base class for all tests
+class Test:
+   def calcMean(self):
+       resTotal = 0
+       for res in self.results:
+           resTotal += res["value"]
+       self.mean = resTotal / len(self.results)
+
+   # this assumes that mean has been calculated
+   def calcStdDev(self):
+       squareTotal = 0
+       for res in self.results:
+           squareTotal += math.pow(res["value"] - self.mean, 2)
+       self.stddev = math.sqrt(squareTotal / len(self.results))
+
+   # this scans through results to see if any files are alarming
+   # it works by comparing their deviation to the standard deviation
+   def flagAlarm(self):
+
+       self.calcMean()
+       self.calcStdDev()
+
+       for res in self.results:
+           dev = res["value"] - self.mean
+
+           #assume that we are only interested in results exceeding the stddev
+           #in the positive direction (ie, greater the value, the more suspicious)
+	   difference = dev - self.stddev
+           if difference > 0:
+	       print ' {0:>7.4f}        {1}'.format(difference, res["filename"])
+
+class LanguageIC(Test):
    """Class that calculates a file's Index of Coincidence as
    as well as a a subset of files average Index of Coincidence.
    """
@@ -101,7 +132,7 @@ class LanguageIC:
            print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        return
 
-class Entropy:
+class Entropy(Test):
    """Class that calculates a file's Entropy."""
 
    def __init__(self):
@@ -135,7 +166,7 @@ class Entropy:
            print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        return
 
-class LongestWord:
+class LongestWord(Test):
    """Class that determines the longest word for a particular file."""
    def __init__(self):
        """Instantiate the longestword_results array."""
@@ -170,7 +201,7 @@ class LongestWord:
            print ' {0:>7}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        return
 
-class SignatureNasty:
+class SignatureNasty(Test):
    """Generator that searches a given file for nasty expressions"""
 
    def __init__(self):
@@ -199,7 +230,7 @@ class SignatureNasty:
            print ' {0:>7}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        return
 
-class SignatureSuperNasty:
+class SignatureSuperNasty(Test):
    """Generator that searches a given file for SUPER-nasty expressions (These are almost always bad!)"""
 
    def __init__(self):
@@ -227,7 +258,7 @@ class SignatureSuperNasty:
            print ' {0:>7}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        return
 
-class UsesEval:
+class UsesEval(Test):
    """Generator that searches a given file for nasty eval with variable"""
 
    def __init__(self):
@@ -257,7 +288,7 @@ class UsesEval:
       return
 
 
-class Compression:
+class Compression(Test):
    """Generator finds compression ratio"""
 
    def __init__(self):
@@ -396,6 +427,11 @@ if __name__ == "__main__":
                      dest="follow_symlinks",
                      default=False,
                      help="Follow symbolic links",)
+   parser.add_option("-z", "--alarm-mode",
+                     action="store_true",
+                     dest="alarm_mode",
+                     default=False,
+                     help="Alarm mode outputs flags only files with high deviation",)
 
    (options, args) = parser.parse_args()
 
@@ -496,12 +532,15 @@ if __name__ == "__main__":
    # Print top rank lists
    rank_list = {}
    for test in tests:
+       if (options.alarm_mode):
+           print "Flagged files for: {}".format(test.__class__.__name__)
+           test.flagAlarm()
        test.sort()
        test.printer(10)
        #compute the cumulative running total rank for all tests
        #all tests are given equal weightage
        for file in test.results:
-           rank_list[file["filename"]] = rank_list.setdefault(file["filename"], 0) + file["rank"]
+	   rank_list[file["filename"]] = rank_list.setdefault(file["filename"], 0) + file["rank"]
 
    rank_sorted = sorted(rank_list.items(), key=lambda x: x[1])
 

@@ -430,7 +430,7 @@ if __name__ == "__main__":
                      dest="follow_symlinks",
                      default=False,
                      help="Follow symbolic links",)
-   parser.add_option("-z", "--alarm-mode",
+   parser.add_option("-m", "--alarm-mode",
                      action="store_true",
                      dest="alarm_mode",
                      default=False,

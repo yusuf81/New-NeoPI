@@ -302,8 +302,10 @@ def resultsAddRank(results):
 class SearchFile:
    """Generator that searches a given filepath with an optional regular
    expression and returns the filepath and filename"""
+   def __init__(self, follow_symlinks):
+       self.follow_symlinks = follow_symlinks
    def search_file_path(self, args, valid_regex):
-       for root, dirs, files in os.walk(args[0]):
+       for root, dirs, files in os.walk(args[0], followlinks=self.follow_symlinks):
            for file in files:
                filename = os.path.join(root, file)
                if (valid_regex.search(file) and os.path.getsize(filename) > SMALLEST):
@@ -388,6 +390,11 @@ if __name__ == "__main__":
                      dest="ignore_unicode",
                      default=False,
                      help="Skip over unicode-y/UTF'y files",)
+   parser.add_option("-f", "--follow-links",
+                     action="store_true",
+                     dest="follow_symlinks",
+                     default=False,
+                     help="Follow symbolic links",)
 
    (options, args) = parser.parse_args()
 
@@ -437,7 +444,7 @@ if __name__ == "__main__":
            tests.append(Compression())
 
    # Instantiate the Generator Class used for searching, opening, and reading files
-   locator = SearchFile()
+   locator = SearchFile(options.follow_symlinks)
 
    # CSV file output array
    csv_array = []

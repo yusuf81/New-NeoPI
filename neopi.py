@@ -27,6 +27,8 @@ from optparse import OptionParser
    
 # Smallest filesize to checkfor in bytes.  
 SMALLEST = 60
+# percentage deviation before alarm will sound
+DEVIATION_THRESH = 0.1
 
 #base class for all tests
 class Test:
@@ -56,8 +58,9 @@ class Test:
            #assume that we are only interested in results exceeding the stddev
            #in the positive direction (ie, greater the value, the more suspicious)
 	   difference = dev - self.stddev
-           if difference > 0:
-	       print ' {0:>7.4f}        {1}'.format(difference, res["filename"])
+	   percentage = difference / self.stddev
+           if percentage > DEVIATION_THRESH:
+	       print ' {0:>7.4f}        {1}'.format(difference, percentage, res["filename"])
 
 class LanguageIC(Test):
    """Class that calculates a file's Index of Coincidence as

@@ -285,6 +285,7 @@ class Compression:
            print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        return
 
+#tags each element of array with its ranking under attribute name "rank"
 def resultsAddRank(results):
    rank = 1
    offset = 1
@@ -471,6 +472,7 @@ if __name__ == "__main__":
                for test in tests:
                    calculated_value = test.calculate(data, filename)
                    # Make the header row if it hasn't been fully populated, +1 here to account for filename column
+                   # possible optimization: move this into its own "for t in tests" loop?
                    if len(csv_header) < len(tests) + 1:
                        csv_header.append(test.__class__.__name__)
                    csv_row.append(calculated_value)
@@ -496,12 +498,15 @@ if __name__ == "__main__":
    for test in tests:
        test.sort()
        test.printer(10)
+       #compute the cumulative running total rank for all tests
+       #all tests are given equal weightage
        for file in test.results:
            rank_list[file["filename"]] = rank_list.setdefault(file["filename"], 0) + file["rank"]
 
    rank_sorted = sorted(rank_list.items(), key=lambda x: x[1])
 
    print "\n[[ Top cumulative ranked files ]]"
+   #print top 10 (or fewer) files with the lowest cumulative ranks
    count = 10
    if (count > len(rank_sorted)): count = len(rank_sorted)
    for x in range(count):

@@ -28,10 +28,14 @@ from optparse import OptionParser
 # Smallest filesize to checkfor in bytes.  
 SMALLEST = 60
 # percentage deviation before alarm will sound
-DEVIATION_THRESH = 0.1
+DEVIATION_THRESH = 1.2
 
 #base class for all tests
 class Test:
+   def __init__(self):
+       # highIsBad means the higher the metric, the more suspicious it is
+       self.highIsBad = True
+
    def calcMean(self):
        resTotal = 0
        for res in self.results:
@@ -47,20 +51,28 @@ class Test:
 
    # this scans through results to see if any files are alarming
    # it works by comparing their deviation to the standard deviation
+   # this method depends on the function isDeviant
    def flagAlarm(self):
 
        self.calcMean()
        self.calcStdDev()
 
+       flagList = []
        for res in self.results:
-           dev = res["value"] - self.mean
+           # current value deviates more than a threshold amount of standard deviation
+	   if dist(res["value"], self.mean) > (DEVIATION_THRESH)*self.stddev:
+               # check that the deviation is in the correct "direction"
+               # for example, we don't care when a file has very low entropy, we only care when it's very high
+	       if (self.highIsBad and res["value"] > self.mean) or (not self.highIsBad and res["value"] < self.mean):
+		   percentage = dist(res["value"], self.mean)/ self.stddev if self.stddev > 0 else float("inf")
+		   res["percentage"] = percentage
+		   flagList.append(res)
 
-           #assume that we are only interested in results exceeding the stddev
-           #in the positive direction (ie, greater the value, the more suspicious)
-	   difference = dev - self.stddev
-	   percentage = difference / self.stddev
-           if percentage > DEVIATION_THRESH:
-	       print ' {0:>7.4f}        {1}'.format(difference, percentage, res["filename"])
+       # sort and print out the flagged results
+       flagList.sort(key=lambda item: item["percentage"])
+       for res in flagList:
+	   print ' {0:>7.4f}       {1}'.format(res["percentage"], res["filename"])
+
 
 class LanguageIC(Test):
    """Class that calculates a file's Index of Coincidence as
@@ -72,6 +84,8 @@ class LanguageIC(Test):
        self.total_char_count = 0
        self.results = []
        self.ic_total_results = ""
+       self.highIsBad = False
+
 
    def calculate_char_count(self,data):
        """Method to calculate character counts for a particular data file."""
@@ -141,6 +155,7 @@ class Entropy(Test):
    def __init__(self):
        """Instantiate the entropy_results array."""
        self.results = []
+       self.highIsBad = True
 
    def calculate(self,data,filename):
        """Calculate the entropy for 'data' and append result to entropy_results array."""
@@ -174,6 +189,7 @@ class LongestWord(Test):
    def __init__(self):
        """Instantiate the longestword_results array."""
        self.results = []
+       self.highIsBad = True
 
    def calculate(self,data,filename):
        """Find the longest word in a string and append to longestword_results array"""
@@ -210,6 +226,7 @@ class SignatureNasty(Test):
    def __init__(self):
        """Instantiate the results array."""
        self.results = []
+       self.highIsBad = True
 
    def calculate(self, data, filename):
        if not data:
@@ -239,6 +256,7 @@ class SignatureSuperNasty(Test):
    def __init__(self):
        """Instantiate the results array."""
        self.results = []
+       self.highIsBad = True
 
    def calculate(self, data, filename):
        if not data:
@@ -267,6 +285,7 @@ class UsesEval(Test):
    def __init__(self):
       """Instantiate the eval_results array."""
       self.results = []
+      self.highIsBad = True
 
    def calculate(self, data, filename):
       if not data:
@@ -297,6 +316,7 @@ class Compression(Test):
    def __init__(self):
        """Instantiate the results array."""
        self.results = []
+       self.highIsBad = True
 
    def calculate(self, data, filename):
        if not data:
@@ -333,6 +353,10 @@ def resultsAddRank(results):
        previousValue = file["value"]
        offset = offset + 1
    return newList
+
+# returns the distance between 2 numbers
+def dist(x,y):
+    return math.fabs(x-y)
 
 class SearchFile:
    """Generator that searches a given filepath with an optional regular

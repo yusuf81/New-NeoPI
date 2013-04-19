@@ -32,16 +32,6 @@ DEVIATION_THRESH = 1.2
 
 #base class for all tests
 class Test:
-   def blockCalculate(self, data, filename, blocksize):
-
-       # for block in blocks
-           # value = self.calculate(block, filename)
-           # if highisbad && value > maxsofar or !highisbad && value < minsofar: assign
-       return max/min
-
-   def calculate(self,data,filename):
-       print "In parent's calculate)"
-
    def __init__(self):
        # highIsBad means the higher the metric, the more suspicious it is
        self.highIsBad = True

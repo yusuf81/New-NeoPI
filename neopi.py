@@ -32,6 +32,16 @@ DEVIATION_THRESH = 1.2
 
 #base class for all tests
 class Test:
+   def blockCalculate(self, data, filename, blocksize):
+
+       # for block in blocks
+           # value = self.calculate(block, filename)
+           # if highisbad && value > maxsofar or !highisbad && value < minsofar: assign
+       return max/min
+
+   def calculate(self,data,filename):
+       print "In parent's calculate)"
+
    def __init__(self):
        # highIsBad means the higher the metric, the more suspicious it is
        self.highIsBad = True
@@ -533,7 +543,7 @@ if __name__ == "__main__":
 
            if (options.ignore_unicode == False or fileAsciiHighRatio < .1):
                for test in tests:
-                   calculated_value = test.calculate(data, filename)
+                   calculated_value = test.blockCalculate(data, filename, 1)
                    # Make the header row if it hasn't been fully populated, +1 here to account for filename column
                    # possible optimization: move this into its own "for t in tests" loop?
                    if len(csv_header) < len(tests) + 1:

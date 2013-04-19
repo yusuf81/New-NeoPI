@@ -32,36 +32,31 @@ DEVIATION_THRESH = 1.2
 
 #base class for all tests
 class Test:
-   def blockCalculate(self, data, filename, blocksize):
-
-       # for block in blocks
-           # value = self.calculate(block, filename)
-           # if highisbad && value > maxsofar or !highisbad && value < minsofar: assign
-       return max/min
-
    def calculate(self,data,filename):
-       print "In parent's calculate)"
+       print "In parent's calculate, this should have been overridden by child!)"
 
    def __init__(self):
        # highIsBad means the higher the metric, the more suspicious it is
        self.highIsBad = True
 
-   def blockCalculate(self,blocksize,data,filename)
+   # chops the file's data into blocks and calculates the metric on each
+   # block and only return the highest (or lowest). this achieves finer granularity.
+   def blockCalculate(self, blocksize, data, filename):
        self.stripped_data =data.replace(' ', '')
        noB=len(self.stripped_data)/blocksize
        Blockdata = []
        maxEntropy = -9999
        minEntropy = 9999
        j = 0
-          for i in range(noB)
-                Blockdata[i] = self.stripped_data[j:j+blocksize] 
-                j=j+blocksize
-                if(iSHighBad = true)
-                        if(maxEntropy <= self.calculate(Blockdata[i],filename))
-                        maxEntropy = self.calculate(Blockdata[i],filename)
-                if(iSHighBad = false)
-                        if(minEntropy > self.calculate(Blockdata[i],filename))
-                        minEntropy = self.calculate(Blockdata[i],filename)
+       for i in range(noB):
+	    Blockdata[i] = self.stripped_data[j:j+blocksize] 
+	    j=j+blocksize
+	    if(self.highIsBad == True):
+		    if(maxEntropy <= self.calculate(Blockdata[i],filename)):
+		        maxEntropy = self.calculate(Blockdata[i],filename)
+	    if(self.highIsBad == False):
+		    if(minEntropy > self.calculate(Blockdata[i],filename)):
+		         minEntropy = self.calculate(Blockdata[i],filename)
        self.results.append({"filename":filename, "value":maxEntropy})
 
    def calcMean(self):
@@ -561,7 +556,8 @@ if __name__ == "__main__":
 
            if (options.ignore_unicode == False or fileAsciiHighRatio < .1):
                for test in tests:
-                   calculated_value = test.blockCalculate(data, filename, 1)
+	           calculated_value = test.calculate(data, filename)
+                   #calculated_value = test.blockCalculate(1, data, filename)
                    # Make the header row if it hasn't been fully populated, +1 here to account for filename column
                    # possible optimization: move this into its own "for t in tests" loop?
                    if len(csv_header) < len(tests) + 1:

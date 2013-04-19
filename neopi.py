@@ -46,6 +46,24 @@ class Test:
        # highIsBad means the higher the metric, the more suspicious it is
        self.highIsBad = True
 
+   def blockCalculate(self,blocksize,data,filename)
+       self.stripped_data =data.replace(' ', '')
+       noB=len(self.stripped_data)/blocksize
+       Blockdata = []
+       maxEntropy = -9999
+       minEntropy = 9999
+       j = 0
+          for i in range(noB)
+                Blockdata[i] = self.stripped_data[j:j+blocksize] 
+                j=j+blocksize
+                if(iSHighBad = true)
+                        if(maxEntropy <= self.calculate(Blockdata[i],filename))
+                        maxEntropy = self.calculate(Blockdata[i],filename)
+                if(iSHighBad = false)
+                        if(minEntropy > self.calculate(Blockdata[i],filename))
+                        minEntropy = self.calculate(Blockdata[i],filename)
+       self.results.append({"filename":filename, "value":maxEntropy})
+
    def calcMean(self):
        resTotal = 0
        for res in self.results:

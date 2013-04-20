@@ -32,25 +32,30 @@ DEVIATION_THRESH = 1.2
 
 #base class for all tests
 class Test:
+   def calculate(self,data,filename):
+       print "In parent's calculate, this should have been overridden by child!)"
+
    def __init__(self):
        # highIsBad means the higher the metric, the more suspicious it is
        self.highIsBad = True
 
-   def blockCalculate(self,blocksize,data,filename)
+   # chops the file's data into blocks and calculates the metric on each
+   # block and only return the highest (or lowest). this achieves finer granularity.
+   def blockCalculate(self, blocksize, data, filename):
        self.stripped_data =data.replace(' ', '')
        noB=len(self.stripped_data)/blocksize
        maxEntropy = -9999
        minEntropy = 9999
        j = 0
-          for i in range(noB)
-                Blockdata = self.stripped_data[j:j+blocksize] 
-                j=j+blocksize
-                if(iSHighBad = true)
-                        if(maxEntropy <= self.calculate(Blockdata,filename))
-                        maxEntropy = self.calculate(Blockdata,filename)
-                if(iSHighBad = false)
-                        if(minEntropy > self.calculate(Blockdata,filename))
-                        minEntropy = self.calculate(Blockdata,filename)
+       for i in range(noB):
+	    Blockdata = self.stripped_data[j:j+blocksize] 
+	    j=j+blocksize
+	    if(self.highIsBad == True):
+		    if(maxEntropy <= self.calculate(Blockdata,filename)):
+		        maxEntropy = self.calculate(Blockdata,filename)
+	    if(self.highIsBad == False):
+		    if(minEntropy > self.calculate(Blockdata,filename)):
+		         minEntropy = self.calculate(Blockdata,filename)
        self.results.append({"filename":filename, "value":maxEntropy})
 
    def calcMean(self):

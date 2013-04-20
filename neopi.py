@@ -44,19 +44,18 @@ class Test:
    def blockCalculate(self, blocksize, data, filename):
        self.stripped_data =data.replace(' ', '')
        noB=len(self.stripped_data)/blocksize
-       Blockdata = []
        maxEntropy = -9999
        minEntropy = 9999
        j = 0
        for i in range(noB):
-	    Blockdata[i] = self.stripped_data[j:j+blocksize] 
+	    Blockdata = self.stripped_data[j:j+blocksize] 
 	    j=j+blocksize
 	    if(self.highIsBad == True):
-		    if(maxEntropy <= self.calculate(Blockdata[i],filename)):
-		        maxEntropy = self.calculate(Blockdata[i],filename)
+		    if(maxEntropy <= self.calculate(Blockdata,filename)):
+		        maxEntropy = self.calculate(Blockdata,filename)
 	    if(self.highIsBad == False):
-		    if(minEntropy > self.calculate(Blockdata[i],filename)):
-		         minEntropy = self.calculate(Blockdata[i],filename)
+		    if(minEntropy > self.calculate(Blockdata,filename)):
+		         minEntropy = self.calculate(Blockdata,filename)
        self.results.append({"filename":filename, "value":maxEntropy})
 
    def calcMean(self):
@@ -151,7 +150,8 @@ class LanguageIC(Test):
            total_char_count += charcount
 
        ic = float(char_count)/(total_char_count * (total_char_count - 1))
-       self.results.append({"filename":filename, "value":ic})
+       if not options.block_mode
+           self.results.append({"filename":filename, "value":ic})
        # Call method to calculate_char_count and append to total_char_count
        self.calculate_char_count(data)
        return ic
@@ -191,7 +191,8 @@ class Entropy(Test):
            p_x = float(self.stripped_data.count(chr(x)))/len(self.stripped_data)
            if p_x > 0:
                entropy += - p_x * math.log(p_x, 2)
-       self.results.append({"filename":filename, "value":entropy})
+       if not options.block_mode
+            self.results.append({"filename":filename, "value":entropy})
        return entropy
 
    def sort(self):
@@ -227,7 +228,8 @@ class LongestWord(Test):
                if length > longest:
                    longest = length
                    longest_word = word
-       self.results.append({"filename":filename, "value":longest})
+       if not options.block_mode
+           self.results.append({"filename":filename, "value":longest})
        return longest
 
    def sort(self):
@@ -257,7 +259,8 @@ class SignatureNasty(Test):
        # Lots taken from the wonderful post at http://stackoverflow.com/questions/3115559/exploitable-php-functions
        valid_regex = re.compile('(eval\(|file_put_contents|base64_decode|python_eval|exec\(|passthru|popen|proc_open|pcntl|assert\(|system\(|shell)', re.I)
        matches = re.findall(valid_regex, data)
-       self.results.append({"filename":filename, "value":len(matches)})
+       if not options.block_mode       
+           self.results.append({"filename":filename, "value":len(matches)})
        return len(matches)
 
    def sort(self):
@@ -286,7 +289,8 @@ class SignatureSuperNasty(Test):
            return "", 0
        valid_regex = re.compile('(@\$_\[\]=|\$_=@\$_GET|\$_\[\+""\]=)', re.I)
        matches = re.findall(valid_regex, data)
-       self.results.append({"filename":filename, "value":len(matches)})
+       if not options.block_mode
+           self.results.append({"filename":filename, "value":len(matches)})
        return len(matches)
 
    def sort(self):
@@ -316,7 +320,8 @@ class UsesEval(Test):
            # Lots taken from the wonderful post at http://stackoverflow.com/questions/3115559/exploitable-php-functions
       valid_regex = re.compile('(eval\(\$(\w|\d))', re.I)
       matches = re.findall(valid_regex, data)
-      self.results.append({"filename":filename, "value":len(matches)})
+      if not options.block_mode
+         self.results.append({"filename":filename, "value":len(matches)})
       return len(matches)
 
    def sort(self):
@@ -346,7 +351,8 @@ class Compression(Test):
            return "", 0
        compressed = zlib.compress(data)
        ratio = float(len(compressed)) / float(len(data))
-       self.results.append({"filename":filename, "value":ratio})
+       if not options.block_mode
+          self.results.append({"filename":filename, "value":ratio})
        return ratio
 
    def sort(self):
@@ -483,6 +489,13 @@ if __name__ == "__main__":
                      default=False,
                      help="Alarm mode outputs flags only files with high deviation",)
 
+   parser.add_option("-b", "--Block-mode",
+                     action="store",
+                     dest="block_mode",
+                     default=False,
+                     help="Block mode calculates the tests selected for the specified block sizes in each file",
+                     metavar="blocksize")
+
    (options, args) = parser.parse_args()
 
    # Error on invalid number of arguements
@@ -556,8 +569,10 @@ if __name__ == "__main__":
 
            if (options.ignore_unicode == False or fileAsciiHighRatio < .1):
                for test in tests:
-	           calculated_value = test.calculate(data, filename)
-                   #calculated_value = test.blockCalculate(1, data, filename)
+                   if options.block_mode:
+                      calculated_value = test.blockCalculate(options.block_mode,data, filename)
+                   else
+                      calculated_value = test.calculate(data, filename)
                    # Make the header row if it hasn't been fully populated, +1 here to account for filename column
                    # possible optimization: move this into its own "for t in tests" loop?
                    if len(csv_header) < len(tests) + 1:

@@ -150,7 +150,7 @@ class LanguageIC(Test):
            total_char_count += charcount
 
        ic = float(char_count)/(total_char_count * (total_char_count - 1))
-       if not options.block_mode
+       if not options.block_mode:
            self.results.append({"filename":filename, "value":ic})
        # Call method to calculate_char_count and append to total_char_count
        self.calculate_char_count(data)
@@ -191,7 +191,7 @@ class Entropy(Test):
            p_x = float(self.stripped_data.count(chr(x)))/len(self.stripped_data)
            if p_x > 0:
                entropy += - p_x * math.log(p_x, 2)
-       if not options.block_mode
+       if not options.block_mode:
             self.results.append({"filename":filename, "value":entropy})
        return entropy
 
@@ -228,7 +228,7 @@ class LongestWord(Test):
                if length > longest:
                    longest = length
                    longest_word = word
-       if not options.block_mode
+       if not options.block_mode:
            self.results.append({"filename":filename, "value":longest})
        return longest
 
@@ -259,7 +259,7 @@ class SignatureNasty(Test):
        # Lots taken from the wonderful post at http://stackoverflow.com/questions/3115559/exploitable-php-functions
        valid_regex = re.compile('(eval\(|file_put_contents|base64_decode|python_eval|exec\(|passthru|popen|proc_open|pcntl|assert\(|system\(|shell)', re.I)
        matches = re.findall(valid_regex, data)
-       if not options.block_mode       
+       if not options.block_mode:       
            self.results.append({"filename":filename, "value":len(matches)})
        return len(matches)
 
@@ -289,7 +289,7 @@ class SignatureSuperNasty(Test):
            return "", 0
        valid_regex = re.compile('(@\$_\[\]=|\$_=@\$_GET|\$_\[\+""\]=)', re.I)
        matches = re.findall(valid_regex, data)
-       if not options.block_mode
+       if not options.block_mode:
            self.results.append({"filename":filename, "value":len(matches)})
        return len(matches)
 
@@ -320,7 +320,7 @@ class UsesEval(Test):
            # Lots taken from the wonderful post at http://stackoverflow.com/questions/3115559/exploitable-php-functions
       valid_regex = re.compile('(eval\(\$(\w|\d))', re.I)
       matches = re.findall(valid_regex, data)
-      if not options.block_mode
+      if not options.block_mode:
          self.results.append({"filename":filename, "value":len(matches)})
       return len(matches)
 
@@ -346,23 +346,23 @@ class CharacterFreq(Test):
        self.results = []
        self.highIsBad = True
 
-   def calculate(self,data,filename)
+   def calculate(self,data,filename):
        self.stripped_data =data.replace(' ', '')
        highestoccurence = [0 for i in range(len(self.stripped_data)/2)]
-       for wordsize in range(len(self.stripped_data)/2)
-           for y in range (len(self.stripped_data) - (worddsize +1))
+       for wordsize in range(len(self.stripped_data)/2):
+           for y in range (len(self.stripped_data) - (wordsize +1)):
              word = self.stripped_data [y:y+wordsize]
-             if self.stripped_data.count(word)/len(self.stripped_data) > highestoccurence[wordsize]
+             if self.stripped_data.count(word)/len(self.stripped_data) > highestoccurence[wordsize]:
                  highestoccurence[wordsize] = self.stripped_data.count(word)/len(self.stripped_data)
        CharFreq = self.weightaverage(highestoccurence)
-       if not options.block_mode
+       if not options.block_mode:
            self.results.append({"filename":filename, "value":CharFreq})
        return CharFreq
 
-   def weightaverage(self, highoccurence)
+   def weightaverage(self, highoccurence):
        sum = 0
        numerator = 0
-       for i in range(len(highoccurence))
+       for i in range(len(highoccurence)):
             sum += i+1
             numerator+= (i+1)*highoccurence[i]
        WA = numerator/sum
@@ -394,7 +394,7 @@ class Compression(Test):
            return "", 0
        compressed = zlib.compress(data)
        ratio = float(len(compressed)) / float(len(data))
-       if not options.block_mode
+       if not options.block_mode:
           self.results.append({"filename":filename, "value":ratio})
        return ratio
 
@@ -622,7 +622,7 @@ if __name__ == "__main__":
                for test in tests:
                    if options.block_mode:
                       calculated_value = test.blockCalculate(options.block_mode,data, filename)
-                   else
+                   else:
                       calculated_value = test.calculate(data, filename)
                    # Make the header row if it hasn't been fully populated, +1 here to account for filename column
                    # possible optimization: move this into its own "for t in tests" loop?

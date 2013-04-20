@@ -338,8 +338,8 @@ class UsesEval(Test):
       return
 
 
-class CharecterFreq(Test):
-   """Class that calculates a file's Weighted Average of the Charecter Frequency."""
+class CharacterFreq(Test):
+   """Class that calculates a file's Weighted Average of the Character Frequency."""
 
    def __init__(self):
        """Instantiate the entropy_results array."""
@@ -532,17 +532,17 @@ if __name__ == "__main__":
                      default=False,
                      help="Alarm mode outputs flags only files with high deviation",)
 
-   parser.add_option("-b", "--Block-mode",
+   parser.add_option("-b", "--block-mode",
                      action="store",
                      dest="block_mode",
                      default=False,
                      help="Block mode calculates the tests selected for the specified block sizes in each file",
                      metavar="blocksize")
-   parser.add_option("-F", "--Charecter-Frequency",
+   parser.add_option("-F", "--character-frequency",
                      action="store_true",
                      dest="is_CF",
                      default=False,
-                     help="Run Charecter Frequency Test",)
+                     help="Run Character Frequency Test",)
 
    (options, args) = parser.parse_args()
 
@@ -575,7 +575,7 @@ if __name__ == "__main__":
        tests.append(LongestWord())
        tests.append(SignatureNasty())
        tests.append(SignatureSuperNasty())
-       tests.append(CharecterFreq())
+       tests.append(CharacterFreq())
    else:
        if options.is_entropy:
            tests.append(Entropy())
@@ -592,7 +592,7 @@ if __name__ == "__main__":
        if options.is_zlib:
            tests.append(Compression())
        if options.is_CF:
-           tests.append(CharecterFreq())
+           tests.append(CharacterFreq())
 
    # Instantiate the Generator Class used for searching, opening, and reading files
    locator = SearchFile(options.follow_symlinks)

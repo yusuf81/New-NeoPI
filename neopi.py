@@ -43,7 +43,7 @@ class Test:
    # block and only return the highest (or lowest). this achieves finer granularity.
    def blockCalculate(self, blocksize, data, filename):
        self.stripped_data =data.replace(' ', '')
-       noB=len(self.stripped_data)/blocksize
+       noB = len(self.stripped_data)/blocksize
        maxEntropy = -9999
        minEntropy = 9999
        j = 0
@@ -352,7 +352,7 @@ class CharacterFreq(Test):
        for wordsize in range(len(self.stripped_data)/2):
            for y in range (len(self.stripped_data) - (wordsize +1)):
              word = self.stripped_data [y:y+wordsize]
-             if self.stripped_data.count(word)/len(self.stripped_data) > highestoccurence[wordsize]:
+             if ((self.stripped_data.count(word)/len(self.stripped_data)) > highestoccurence[wordsize]):
                  highestoccurence[wordsize] = self.stripped_data.count(word)/len(self.stripped_data)
        CharFreq = self.weightaverage(highestoccurence)
        if not options.block_mode:
@@ -362,7 +362,9 @@ class CharacterFreq(Test):
    def weightaverage(self, highoccurence):
        sum = 0
        numerator = 0
+       print "before loop"
        for i in range(len(highoccurence)):
+            print i
             sum += i+1
             numerator+= (i+1)*highoccurence[i]
        WA = numerator/sum
@@ -374,8 +376,8 @@ class CharacterFreq(Test):
        self.results = resultsAddRank(self.results)
 
    def printer(self, count):
-       """Print the top signature count match files for a given search"""
-       print "\n[[ Top %i entropic files for a given search ]]" % (count)
+       """Print the top files for a given search"""
+       print "\n[[ Top %i Character Frequent files for a given search ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
        for x in range(count):
            print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
@@ -621,7 +623,7 @@ if __name__ == "__main__":
            if (options.ignore_unicode == False or fileAsciiHighRatio < .1):
                for test in tests:
                    if options.block_mode:
-                      calculated_value = test.blockCalculate(options.block_mode,data, filename)
+                      calculated_value = test.blockCalculate(int(options.block_mode),data, filename)
                    else:
                       calculated_value = test.calculate(data, filename)
                    # Make the header row if it hasn't been fully populated, +1 here to account for filename column

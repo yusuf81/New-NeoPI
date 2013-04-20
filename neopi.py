@@ -333,6 +333,49 @@ class UsesEval(Test):
       return
 
 
+class CharecterFreq(Test):
+   """Class that calculates a file's Weighted Average of the Charecter Frequency."""
+
+   def __init__(self):
+       """Instantiate the entropy_results array."""
+       self.results = []
+       self.highIsBad = True
+
+  def calculate(self,data,filename)
+       self.stripped_data =data.replace(' ', '')
+       highestoccurence = [0 for i in range(len(self.stripped_data)/2)]
+       for wordsize in range(len(self.stripped_data)/2)
+           for y in range (len(self.stripped_data) - (worddsize +1))
+             word = self.stripped_data [y:y+wordsize]
+             if self.stripped_data.count(word)/len(self.stripped_data) > highestoccurence[wordsize]
+                 highestoccurence[wordsize] = self.stripped_data.count(word)/len(self.stripped_data)
+       CharFreq = self.weightaverage(highestoccurence)
+       if not options.block_mode
+           self.results.append({"filename":filename, "value":CharFreq})
+       return CharFreq
+
+  def weightaverage(self, highoccurence)
+       sum = 0
+       numerator = 0
+       for i in range(len(highoccurence))
+            sum += i+1
+            numerator+= (i+1)*highoccurence[i]
+       WA = numerator/sum
+       return WA
+
+   def sort(self):
+       self.results.sort(key=lambda item: item["value"])
+       self.results.reverse()
+       self.results = resultsAddRank(self.results)
+
+   def printer(self, count):
+       """Print the top signature count match files for a given search"""
+       print "\n[[ Top %i entropic files for a given search ]]" % (count)
+       if (count > len(self.results)): count = len(self.results)
+       for x in range(count):
+           print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       return
+
 class Compression(Test):
    """Generator finds compression ratio"""
 
@@ -490,6 +533,11 @@ if __name__ == "__main__":
                      default=False,
                      help="Block mode calculates the tests selected for the specified block sizes in each file",
                      metavar="blocksize")
+   parser.add_option("-F", "--Charecter-Frequency",
+                     action="store_true",
+                     dest="is_CF",
+                     default=False,
+                     help="Run Charecter Frequency Test",)
 
    (options, args) = parser.parse_args()
 
@@ -522,6 +570,7 @@ if __name__ == "__main__":
        tests.append(LongestWord())
        tests.append(SignatureNasty())
        tests.append(SignatureSuperNasty())
+       tests.append(CharecterFreq())
    else:
        if options.is_entropy:
            tests.append(Entropy())
@@ -537,6 +586,8 @@ if __name__ == "__main__":
            tests.append(UsesEval())
        if options.is_zlib:
            tests.append(Compression())
+       if options.is_CF:
+           tests.append(CharecterFreq())
 
    # Instantiate the Generator Class used for searching, opening, and reading files
    locator = SearchFile(options.follow_symlinks)

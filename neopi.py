@@ -346,7 +346,7 @@ class CharecterFreq(Test):
        self.results = []
        self.highIsBad = True
 
-  def calculate(self,data,filename)
+   def calculate(self,data,filename)
        self.stripped_data =data.replace(' ', '')
        highestoccurence = [0 for i in range(len(self.stripped_data)/2)]
        for wordsize in range(len(self.stripped_data)/2)
@@ -359,7 +359,7 @@ class CharecterFreq(Test):
            self.results.append({"filename":filename, "value":CharFreq})
        return CharFreq
 
-  def weightaverage(self, highoccurence)
+   def weightaverage(self, highoccurence)
        sum = 0
        numerator = 0
        for i in range(len(highoccurence))

@@ -26,7 +26,7 @@ from optparse import OptionParser
 #
    
 # Smallest filesize to checkfor in bytes.  
-SMALLEST = 60
+SMALLEST = 1 # change this back!
 # percentage deviation before alarm will sound
 DEVIATION_THRESH = 1.2
 
@@ -347,27 +347,37 @@ class CharacterFreq(Test):
        self.highIsBad = True
 
    def calculate(self,data,filename):
+       if False: print "calculating frequecy for file: {}".format(filename)
        self.stripped_data =data.replace(' ', '')
-       highestoccurence = [0 for i in range(len(self.stripped_data)/2)]
-       for wordsize in range(len(self.stripped_data)/2):
-           for y in range (len(self.stripped_data) - (wordsize +1)):
-             word = self.stripped_data [y:y+wordsize]
-             if ((self.stripped_data.count(word)/len(self.stripped_data)) > highestoccurence[wordsize]):
-                 highestoccurence[wordsize] = self.stripped_data.count(word)/len(self.stripped_data)
+       maxWordSize = min(len(self.stripped_data)/2, 40)
+       highestoccurence = [0 for i in range(maxWordSize)]
+       for wordsize in range(1, maxWordSize):
+	   if False: print "checking wordsize = {}".format(wordsize)
+           for y in range (len(self.stripped_data) - (wordsize)):
+               word = self.stripped_data [y:y+wordsize]
+	       numOccurences = self.stripped_data.count(word) - 1 # -1 so that it doesn't count itself
+	       proportion = float(numOccurences) / (len(self.stripped_data) / (wordsize+1))
+	       if False: print "checking for word = {}, found {} occurences with proportion = {}".format(word, numOccurences, proportion)
+               if ((proportion) > highestoccurence[wordsize]):
+                   highestoccurence[wordsize] = proportion
+	   if False: print "for wordsize of {}, the highest is {}".format(wordsize, highestoccurence[wordsize])
+           
        CharFreq = self.weightaverage(highestoccurence)
        if not options.block_mode:
            self.results.append({"filename":filename, "value":CharFreq})
        return CharFreq
 
    def weightaverage(self, highoccurence):
-       sum = 0
+       print "highoccurence is {}".format(highoccurence)
+       print "highoccurence has length: {}".format(len(highoccurence))
+       mySum = 0
        numerator = 0
-       print "before loop"
        for i in range(len(highoccurence)):
-            print i
-            sum += i+1
+            mySum += i+1
             numerator+= (i+1)*highoccurence[i]
-       WA = numerator/sum
+       if False: print "numerator / sum = {}/{}".format(numerator, mySum)
+       WA = float(numerator)/mySum
+       if False: print "weightaverage is: {}".format(WA)
        return WA
 
    def sort(self):
@@ -443,7 +453,9 @@ class SearchFile:
                filename = os.path.join(root, file)
                if (valid_regex.search(file) and os.path.getsize(filename) > SMALLEST):
                    try:
+	               if False: print "opening file as {}".format(file)
                        data = open(root + "/" + file, 'rb').read()
+	               if False: print "got data as {}".format(data)
                    except:
                        data = False
                        print "Could not read file :: %s/%s" % (root, file)

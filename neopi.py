@@ -42,23 +42,26 @@ class Test:
    # chops the file's data into blocks and calculates the metric on each
    # block and only return the highest (or lowest). this achieves finer granularity.
    def blockCalculate(self, blocksize, data, filename):
-       noB = len(data)/blocksize
+       noB = int(math.ceil(float(len(data))/blocksize))
        maxEntropy = -9999
        minEntropy = 9999
        j = 0
+       pos = 0
        for i in range(noB):
 	    Blockdata = data[j:j+blocksize]
 	    j=j+blocksize
 	    if(self.highIsBad == True):
 		    if(maxEntropy <= self.calculate(Blockdata,filename)):
 		        maxEntropy = self.calculate(Blockdata,filename)
+                        pos = i * blocksize
 	    if(self.highIsBad == False):
 		    if(minEntropy > self.calculate(Blockdata,filename)):
 		         minEntropy = self.calculate(Blockdata,filename)
+                         pos = i * blocksize
        if(self.highIsBad == True):
-          self.results.append({"filename":filename, "value":maxEntropy})
+          self.results.append({"filename":filename, "position":pos, "value":maxEntropy})
        else:
-          self.results.append({"filename":filename, "value":minEntropy})
+          self.results.append({"filename":filename, "position":pos, "value":minEntropy})
 
    def calcMean(self):
        resTotal = 0
@@ -170,8 +173,12 @@ class LanguageIC(Test):
        print self.ic_total_results
        print "\n[[ Top %i lowest IC files ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
-       for x in range(count):
-           print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if not options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class Entropy(Test):
@@ -206,8 +213,12 @@ class Entropy(Test):
        """Print the top signature count match files for a given search"""
        print "\n[[ Top %i entropic files for a given search ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
-       for x in range(count):
-           print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if not options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class LongestWord(Test):
@@ -243,8 +254,12 @@ class LongestWord(Test):
        """Print the top signature count match files for a given search"""
        print "\n[[ Top %i longest word files ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
-       for x in range(count):
-           print ' {0:>7}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if not options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class SignatureNasty(Test):
@@ -274,8 +289,12 @@ class SignatureNasty(Test):
        """Print the top signature count match files for a given search"""
        print "\n[[ Top %i signature match counts ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
-       for x in range(count):
-           print ' {0:>7}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if not options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class SignatureSuperNasty(Test):
@@ -304,8 +323,12 @@ class SignatureSuperNasty(Test):
        """Print the top signature count match files for a given search"""
        print "\n[[ Top %i SUPER-signature match counts (These are usually bad!) ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
-       for x in range(count):
-           print ' {0:>7}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if not options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class UsesEval(Test):
@@ -335,8 +358,12 @@ class UsesEval(Test):
       """Print the files that use eval"""
       print "\n[[ Top %i eval match counts ]]" % (count)
       if (count > len(self.results)): count = len(self.results)
-      for x in range(count):
-        print ' {0:>7}          {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+      if not options.block_mode:
+          for x in range(count):
+              print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+      if options.block_mode:
+          for x in range(count):
+              print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
       return
 
 
@@ -392,8 +419,12 @@ class CharacterFreq(Test):
        """Print the top files for a given search"""
        print "\n[[ Top %i Character Frequent files for a given search ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
-       for x in range(count):
-           print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if not options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class Compression(Test):
@@ -422,8 +453,12 @@ class Compression(Test):
        """Print the top files for a given search"""
        print "\n[[ Top %i compression match counts ]]" % (count)
        if (count > len(self.results)): count = len(self.results)
-       for x in range(count):
-           print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if not options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
+       if options.block_mode:
+           for x in range(count):
+               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 #tags each element of array with its ranking under attribute name "rank"

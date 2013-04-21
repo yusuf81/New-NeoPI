@@ -59,9 +59,11 @@ class Test:
 		         minEntropy = self.calculate(Blockdata,filename)
                          pos = i * blocksize
        if(self.highIsBad == True):
-          self.results.append({"filename":filename, "position":pos, "value":maxEntropy})
+          self.results.append({"filename":filename, "value":maxEntropy, "position":pos})
+          return {"value":maxEntropy, "position":pos}
        else:
-          self.results.append({"filename":filename, "position":pos, "value":minEntropy})
+          self.results.append({"filename":filename, "value":minEntropy, "position":pos})
+          return {"value":minEntropy, "position":pos}
 
    def calcMean(self):
        resTotal = 0
@@ -178,7 +180,7 @@ class LanguageIC(Test):
                print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        if options.block_mode:
            for x in range(count):
-               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
+               print ' {0:>7.4f}   at byte number:{1}     {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class Entropy(Test):
@@ -218,7 +220,7 @@ class Entropy(Test):
                print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        if options.block_mode:
            for x in range(count):
-               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
+               print ' {0:>7.4f}   at byte number:{1}     {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class LongestWord(Test):
@@ -259,7 +261,7 @@ class LongestWord(Test):
                print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        if options.block_mode:
            for x in range(count):
-               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
+               print ' {0:>7.4f}   at byte number:{1}     {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class SignatureNasty(Test):
@@ -294,7 +296,7 @@ class SignatureNasty(Test):
                print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        if options.block_mode:
            for x in range(count):
-               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
+               print ' {0:>7.4f}   at byte number:{1}     {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class SignatureSuperNasty(Test):
@@ -328,7 +330,7 @@ class SignatureSuperNasty(Test):
                print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        if options.block_mode:
            for x in range(count):
-               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
+               print ' {0:>7.4f}   at byte number:{1}     {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class UsesEval(Test):
@@ -363,7 +365,7 @@ class UsesEval(Test):
               print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
       if options.block_mode:
           for x in range(count):
-              print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
+              print ' {0:>7.4f}   at byte number:{1}     {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
       return
 
 
@@ -424,7 +426,7 @@ class CharacterFreq(Test):
                print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        if options.block_mode:
            for x in range(count):
-               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
+               print ' {0:>7.4f}   at byte number:{1}     {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 class Compression(Test):
@@ -458,7 +460,7 @@ class Compression(Test):
                print ' {0:>7.4f}        {1}'.format(self.results[x]["value"], self.results[x]["filename"])
        if options.block_mode:
            for x in range(count):
-               print ' {0:>7.4f}      at byte number:{1} {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
+               print ' {0:>7.4f}   at byte number:{1}     {2}'.format(self.results[x]["value"], self.results[x]["position"], self.results[x]["filename"])
        return
 
 #tags each element of array with its ranking under attribute name "rank"
@@ -655,6 +657,11 @@ if __name__ == "__main__":
    # Grab the file and calculate each test against file
    fileCount = 0
    fileIgnoreCount = 0
+   for test in tests:
+       csv_header.append(test.__class__.__name__)
+       if options.block_mode:
+           csv_header.append("position")
+
    for data, filename in locator.search_file_path(args, valid_regex):
        if data:
            # a row array for the CSV
@@ -677,9 +684,11 @@ if __name__ == "__main__":
                       calculated_value = test.calculate(data, filename)
                    # Make the header row if it hasn't been fully populated, +1 here to account for filename column
                    # possible optimization: move this into its own "for t in tests" loop?
-                   if len(csv_header) < len(tests) + 1:
-                       csv_header.append(test.__class__.__name__)
-                   csv_row.append(calculated_value)
+                   if not options.block_mode:
+                      csv_row.append(calculated_value)
+                   else:
+                      csv_row.append(calculated_value["value"])
+                      csv_row.append(calculated_value["position"])
                    fileCount = fileCount + 1
                csv_array.append(csv_row)
            else:

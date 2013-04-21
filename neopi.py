@@ -42,13 +42,12 @@ class Test:
    # chops the file's data into blocks and calculates the metric on each
    # block and only return the highest (or lowest). this achieves finer granularity.
    def blockCalculate(self, blocksize, data, filename):
-       self.stripped_data =data.replace(' ', '')
-       noB = len(self.stripped_data)/blocksize
+       noB = len(data)/blocksize
        maxEntropy = -9999
        minEntropy = 9999
        j = 0
        for i in range(noB):
-	    Blockdata = self.stripped_data[j:j+blocksize] 
+	    Blockdata = data[j:j+blocksize] 
 	    j=j+blocksize
 	    if(self.highIsBad == True):
 		    if(maxEntropy <= self.calculate(Blockdata,filename)):

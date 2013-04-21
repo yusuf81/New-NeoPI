@@ -338,6 +338,7 @@ class UsesEval(Test):
       return
 
 
+#currently this test is too expensive to be practical
 class CharacterFreq(Test):
    """Class that calculates a file's Weighted Average of the Character Frequency."""
 
@@ -556,7 +557,7 @@ if __name__ == "__main__":
                      action="store_true",
                      dest="is_CF",
                      default=False,
-                     help="Run Character Frequency Test",)
+                     help="(Experimental) Run Character Frequency Test",)
 
    (options, args) = parser.parse_args()
 

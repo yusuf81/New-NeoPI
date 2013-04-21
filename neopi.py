@@ -47,7 +47,7 @@ class Test:
        minEntropy = 9999
        j = 0
        for i in range(noB):
-	    Blockdata = data[j:j+blocksize] 
+	    Blockdata = data[j:j+blocksize]
 	    j=j+blocksize
 	    if(self.highIsBad == True):
 		    if(maxEntropy <= self.calculate(Blockdata,filename)):
@@ -55,7 +55,10 @@ class Test:
 	    if(self.highIsBad == False):
 		    if(minEntropy > self.calculate(Blockdata,filename)):
 		         minEntropy = self.calculate(Blockdata,filename)
-       self.results.append({"filename":filename, "value":maxEntropy})
+       if(self.highIsBad == True):
+          self.results.append({"filename":filename, "value":maxEntropy})
+       else:
+          self.results.append({"filename":filename, "value":minEntropy})
 
    def calcMean(self):
        resTotal = 0
@@ -182,10 +185,10 @@ class Entropy(Test):
    def calculate(self,data,filename):
        """Calculate the entropy for 'data' and append result to entropy_results array."""
 
-       if not data:
+       self.stripped_data =data.replace(' ', '')
+       if not self.stripped_data:
            return 0
        entropy = 0
-       self.stripped_data =data.replace(' ', '')
        for x in range(256):
            p_x = float(self.stripped_data.count(chr(x)))/len(self.stripped_data)
            if p_x > 0:
@@ -589,7 +592,6 @@ if __name__ == "__main__":
        tests.append(LongestWord())
        tests.append(SignatureNasty())
        tests.append(SignatureSuperNasty())
-       tests.append(CharacterFreq())
    else:
        if options.is_entropy:
            tests.append(Entropy())

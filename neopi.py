@@ -145,7 +145,7 @@ class LanguageIC(Test):
 
    def calculate(self,data,filename):
        """Calculate the Index of Coincidence for a file and append to self.ic_results array"""
-       if not data:
+       if not data or (len(data)==1):
            return 0
        char_count = 0
        total_char_count = 0
@@ -155,7 +155,6 @@ class LanguageIC(Test):
            charcount = data.count(char)
            char_count += charcount * (charcount - 1)
            total_char_count += charcount
-
        ic = float(char_count)/(total_char_count * (total_char_count - 1))
        if not options.block_mode:
            # this is because in block_mode, calculate is called many times

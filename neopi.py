@@ -28,7 +28,7 @@ from optparse import OptionParser
 # Smallest filesize to checkfor in bytes.  
 SMALLEST = 1 # change this back!
 # percentage deviation before alarm will sound
-DEVIATION_THRESH = 1.2
+DEVIATION_THRESH = 1.5
 
 #base class for all tests
 class Test:
@@ -158,6 +158,10 @@ class LanguageIC(Test):
 
        ic = float(char_count)/(total_char_count * (total_char_count - 1))
        if not options.block_mode:
+           # this is because in block_mode, calculate is called many times
+           # for a file, yet we only want a single result to show for 1 file
+           # in block_mode, the appending of results is handled separately by
+           # blockCalculate
            self.results.append({"filename":filename, "value":ic})
        # Call method to calculate_char_count and append to total_char_count
        self.calculate_char_count(data)

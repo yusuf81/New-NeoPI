@@ -1,5 +1,16 @@
+Readme for New-NeoPI
+====================
 #New-NeoPI
 This is a fork of NeoPI.
+
+#What's new in New-NeoPI
+1. Added an `alarm' mode which flags files as web shells. The command line option is -m, e.g. ./neopi.py -efAm 2 /var/www/ for sensitivity of 2
+2. Added a new block-level scanning mode which scans by block instead of file level. The command line option is -b, e.g. ./neopi.py -efAb 512 /var/www/
+3. Added a new statistical test called Character Frequency. The command line option is -F. This test is experimental and performs poorly.
+
+
+Original Readme from NeoPI
+==========================
 
 #What is NeoPI?
 NeoPI is a Python script that uses a variety of statistical methods to detect obfuscated and encrypted content within text/script files. The intended purpose of NeoPI is to aid in the detection of hidden web shell code. The development focus of NeoPI was creating a tool that could be used in conjunction with other established detection methods such as Linux Malware Detect or traditional signature/keyword based searches.

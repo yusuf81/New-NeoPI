@@ -547,7 +547,7 @@ if __name__ == "__main__":
                      action="store_true",
                      dest="is_eval",
                      default=False,
-                     help="Run signiture test for the eval",)
+                     help="Run signature test for the eval",)
    parser.add_option("-l", "--longestword",
                      action="store_true",
                      dest="is_longest",
@@ -584,10 +584,11 @@ if __name__ == "__main__":
                      default=False,
                      help="Follow symbolic links",)
    parser.add_option("-m", "--alarm-mode",
-                     action="store_true",
+                     action="store",
                      dest="alarm_mode",
                      default=False,
-                     help="Alarm mode outputs flags only files with high deviation",)
+                     help="Alarm mode outputs flags only files with high deviation",
+		     metavar="sensitivity",)
 
    parser.add_option("-b", "--block-mode",
                      action="store",
@@ -713,21 +714,24 @@ if __name__ == "__main__":
    rank_list = {}
    for test in tests:
        if (options.alarm_mode):
+	   DEVIATION_THRESH = float(options.alarm_mode)
            print "Flagged files for: {}".format(test.__class__.__name__)
            test.flagAlarm()
-       test.sort()
-       test.printer(10)
-       #compute the cumulative running total rank for all tests
-       #all tests are given equal weightage
-       for file in test.results:
-	   rank_list[file["filename"]] = rank_list.setdefault(file["filename"], 0) + file["rank"]
+       else:
+	   test.sort()
+	   test.printer(10)
+	   #compute the cumulative running total rank for all tests
+	   #all tests are given equal weightage
+	   for file in test.results:
+	       rank_list[file["filename"]] = rank_list.setdefault(file["filename"], 0) + file["rank"]
 
-   rank_sorted = sorted(rank_list.items(), key=lambda x: x[1])
+   if(not options.alarm_mode):
+       rank_sorted = sorted(rank_list.items(), key=lambda x: x[1])
 
-   print "\n[[ Top cumulative ranked files ]]"
-   #print top 10 (or fewer) files with the lowest cumulative ranks
-   count = 10
-   if (count > len(rank_sorted)): count = len(rank_sorted)
-   for x in range(count):
-       print ' {0:>7}        {1}'.format(rank_sorted[x][1], rank_sorted[x][0])
+       print "\n[[ Top cumulative ranked files ]]"
+       #print top 10 (or fewer) files with the lowest cumulative ranks
+       count = 10
+       if (count > len(rank_sorted)): count = len(rank_sorted)
+       for x in range(count):
+	   print ' {0:>7}        {1}'.format(rank_sorted[x][1], rank_sorted[x][0])
    

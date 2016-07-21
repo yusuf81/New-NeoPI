@@ -40,7 +40,7 @@ Let’s run neopi.py with the -h flag to see the options.
 	  -a, --all             Run all tests [Entropy, Longest Word, Compression
 	  -e, --entropy         Run entropy Test
 	  -l, --longestword     Run longest word test
-	  -c, --ic              Run IC test
+	  -i, --ic              Run IC test
 	  -A, --auto            Run auto file extension tests
 
 Let’s break down the options into greater detail.
@@ -57,7 +57,7 @@ This flag can be set to run only the entropy test.
 	-l, --longestword
 This flag can be set to run only the longest word test.  
 
-	-c, --ic
+	-i, --ic
 This flag can be set to run only the Index of Coincidence test.  
 
 	-A, --auto 

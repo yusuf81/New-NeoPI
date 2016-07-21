@@ -510,14 +510,7 @@ if __name__ == "__main__":
    timeStart = time.clock()
 
    print """
-       )         (   (
-    ( /(         )\ ))\ )
-    )\())  (    (()/(()/(
-   ((_)\  ))\ (  /(_))(_))
-    _((_)/((_))\(_))(_))
-   | \| (_)) ((_) _ \_ _|
-   | .` / -_) _ \  _/| |
-   |_|\_\___\___/_| |___| Ver. *.USEGIT
+   yusuf81-modified-neopi
    """
 
    parser = OptionParser(usage="usage: %prog [options] <start directory> <OPTIONAL: filename regex>",

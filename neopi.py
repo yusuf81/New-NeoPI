@@ -542,12 +542,12 @@ class SearchFile:
                     if valid_regex.search(file) and os.path.getsize(filename) > SMALLEST:
                         try:
                             data = open(root + "/" + file, 'rb').read()
-                        except (OSError, IOError):
+                        except: (OSError, IOError):
                             data = False
                             raise
                         finally:
                             yield data, filename
-                    except (OSError, IOError):
+                    except: (OSError, IOError):
                         print "Could not read file :: %s/%s" % (root, file)
 
 if __name__ == "__main__":

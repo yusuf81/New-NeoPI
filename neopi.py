@@ -315,11 +315,11 @@ class SignatureSuperNasty(Test):
 
     def printer(self, result_count):
         """Print top signature match results."""
-        print(f"\n[[ Top {count} SUPER-signature match counts (These are usually bad!) ]]")
-        if count > len(self.results):
-            count = len(self.results)
+        print(f"\n[[ Top {result_count} SUPER-signature match counts (These are usually bad!) ]]")
+        if result_count > len(self.results):
+            result_count = len(self.results)
         if not options.block_mode:
-            for x in range(count):
+            for x in range(result_count):
                 print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
         if options.block_mode:
             for x in range(count):
@@ -353,11 +353,11 @@ class UsesEval(Test):
 
     def printer(self, result_count):
         """Print top super-signature match results."""
-        print(f"\n[[ Top {count} eval match counts ]]")
-        if count > len(self.results):
-            count = len(self.results)
+        print(f"\n[[ Top {result_count} eval match counts ]]")
+        if result_count > len(self.results):
+            result_count = len(self.results)
         if not options.block_mode:
-            for x in range(count):
+            for x in range(result_count):
                 print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
         if options.block_mode:
             for x in range(count):

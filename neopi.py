@@ -145,7 +145,7 @@ class LanguageIC(Test):
         return coincidence_index
 
     def sort(self):
-        """Sort results by match count in descending order."""
+        """Sort results by compression ratio in descending order."""
         """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
@@ -323,7 +323,7 @@ class SignatureSuperNasty(Test):
             for idx in range(result_count):
                 print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
-            for x in range(count):
+            for idx in range(count):
                 print(
                     f' {self.results[x]["value"]:>7.4f}   '
                     f'at byte number:{self.results[x]["position"]}     '
@@ -375,7 +375,7 @@ class Compression(Test):
         self.results = []
         self.high_is_bad = True
 
-    def calculate(self, file_data, file_path):
+    def calculate(self, input_data, filepath):
         """Calculate compression ratio for given data."""
         if not file_data:
             return 0
@@ -408,7 +408,7 @@ def results_add_rank(results):
     offset = 1
     previous_value = False
     new_list = []
-    for file in results:
+    for result in results:
         if previous_value and previous_value != file["value"]:
             rank = offset
         file["rank"] = rank
@@ -430,8 +430,9 @@ class SearchFile:
     def is_valid_file(self, filepath, regex):
         """Check if file matches search criteria."""
         return (os.path.exists(filepath) and
-                regex.search(os.path.basename(filepath)) and
-                os.path.getsize(filepath) > SMALLEST)
+                regex.search(os.path.basename(filepath)) and 
+                os.path.getsize(filepath) > SMALLEST
+            )
 
     def search_file_path(self, args, pattern):
         """Search files in path matching regex pattern."""

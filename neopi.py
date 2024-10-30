@@ -169,7 +169,7 @@ class Entropy(Test):
     def __init__(self):
         super().__init__()
         self.results = []
-        self.highIsBad = True
+        self.high_is_bad = True
 
     def calculate(self, data, filename):
         if not data:

@@ -256,19 +256,20 @@ class SignatureNasty(Test):
         self.high_is_bad = True
 
     def calculate(self, input_data, filepath):
-        if not data:
+        """Calculate number of suspicious signature matches in input data."""
+        if not input_data:
             return 0
         try:
-            decoded_text = data.decode('utf-8', errors='ignore')
+            input_text = input_data.decode('utf-8', errors='ignore')
         except (UnicodeDecodeError, ValueError):
             return 0
-        valid_regex = re.compile(
+        signature_pattern = re.compile(
             r'(eval\(|file_put_contents|base64_decode|python_eval|exec\(|'
             r'passthru|popen|proc_open|pcntl|assert\(|system\(|shell)',
             re.I)
-        matches = re.findall(valid_regex, text_data)
+        matches = re.findall(signature_pattern, input_text)
         if not options.block_mode:
-            self.results.append({"filename": filename, "value": len(matches)})
+            self.results.append({"filename": filepath, "value": len(matches)})
         return len(matches)
 
     def sort(self):
@@ -293,24 +294,27 @@ class SignatureSuperNasty(Test):
         self.results = []
         self.high_is_bad = True
 
-    def calculate(self, data, filename):
-        if not data:
+    def calculate(self, input_data, filepath):
+        """Calculate number of super-suspicious signature matches in input data."""
+        if not input_data:
             return 0
         try:
-            text_data = data.decode('utf-8', errors='ignore')
+            input_text = input_data.decode('utf-8', errors='ignore')
         except UnicodeDecodeError:
             return 0
-        valid_regex = re.compile(r'(@\$_\[\]=|\$_=@\$_GET|\$_\[\+""\]=)', re.I)
-        matches = re.findall(valid_regex, text_data)
+        signature_pattern = re.compile(r'(@\$_\[\]=|\$_=@\$_GET|\$_\[\+""\]=)', re.I)
+        matches = re.findall(signature_pattern, input_text)
         if not options.block_mode:
             self.results.append({"filename": filename, "value": len(matches)})
         return len(matches)
 
     def sort(self):
+        """Sort results by match count in descending order."""
         self.results.sort(key=lambda item: item["value"], reverse=True)
         self.results = results_add_rank(self.results)
 
-    def printer(self, count):
+    def printer(self, result_count):
+        """Print top signature match results."""
         print(f"\n[[ Top {count} SUPER-signature match counts (These are usually bad!) ]]")
         if count > len(self.results):
             count = len(self.results)
@@ -343,10 +347,12 @@ class UsesEval(Test):
         return len(matches)
 
     def sort(self):
+        """Sort results by match count in descending order."""
         self.results.sort(key=lambda item: item["value"], reverse=True)
         self.results = results_add_rank(self.results)
 
-    def printer(self, count):
+    def printer(self, result_count):
+        """Print top super-signature match results."""
         print(f"\n[[ Top {count} eval match counts ]]")
         if count > len(self.results):
             count = len(self.results)

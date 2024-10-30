@@ -33,13 +33,13 @@ class Test:
         self.mean = 0
         self.stddev = 0
 
-    def calculate(self, data, filename):
+    def calculate(self, file_data, file_path):
         """Calculate metric for given data. Should be overridden by child classes."""
         raise NotImplementedError("Calculate method must be implemented by child class")
 
-    def block_calculate(self, blocksize, data, filename):
+    def block_calculate(self, block_size, data, filename):
         """Calculate metric for blocks of data of given size."""
-        num_blocks = int(math.ceil(len(data)/blocksize))
+        num_blocks = int(math.ceil(len(data) / block_size))
         max_entropy = -9999
         min_entropy = 9999
         j = 0
@@ -76,7 +76,7 @@ class Test:
     def flag_alarm(self):
         """Flag suspicious files based on deviation from mean."""
         self.calc_mean()
-        self.calc_std_dev() 
+        self.calc_std_dev()
 
         flag_list = []
         for res in self.results:
@@ -142,6 +142,7 @@ class LanguageIC(Test):
         return ic
 
     def sort(self):
+        """Sort results by value and add ranking."""
         """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
@@ -244,14 +245,14 @@ class SignatureNasty(Test):
     def __init__(self):
         super().__init__()
         self.results = []
-        self.highIsBad = True
+        self.high_is_bad = True
 
     def calculate(self, data, filename):
         if not data:
             return 0
         try:
             text_data = data.decode('utf-8', errors='ignore')
-        except:
+        except (UnicodeDecodeError, ValueError):
             return 0
         valid_regex = re.compile(r'(eval\(|file_put_contents|base64_decode|python_eval|exec\(|passthru|popen|proc_open|pcntl|assert\(|system\(|shell)', re.I)
         matches = re.findall(valid_regex, text_data)

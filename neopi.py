@@ -361,32 +361,34 @@ class Compression(Test):
     def __init__(self):
         super().__init__()
         self.results = []
-        self.highIsBad = True
+        self.high_is_bad = True
 
-    def calculate(self, data, filename):
-        if not data:
+    def calculate(self, file_data, file_path):
+        """Calculate compression ratio for given data."""
+        if not file_data:
             return 0
-        compressed = zlib.compress(data)
-        ratio = float(len(compressed)) / float(len(data))
+        compressed = zlib.compress(file_data)
+        ratio = float(len(compressed)) / float(len(file_data))
         if not options.block_mode:
-            self.results.append({"filename": filename, "value": ratio})
+            self.results.append({"filename": file_path, "value": ratio})
         return ratio
 
     def sort(self):
+        """Sort results by compression ratio."""
         self.results.sort(key=lambda item: item["value"], reverse=True)
         self.results = results_add_rank(self.results)
 
-    def printer(self, count):
-        print(f"\n[[ Top {count} compression match counts ]]")
-        if count > len(self.results):
-            count = len(self.results)
+    def printer(self, result_count):
+        """Print top compression ratio results."""
+        print(f"\n[[ Top {result_count} compression match counts ]]")
+        if result_count > len(self.results):
+            result_count = len(self.results)
         if not options.block_mode:
-            for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
+            for idx in range(result_count):
+                print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
-            for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}   at byte number:{self.results[x]["position"]}     {self.results[x]["filename"]}')
-        return
+            for idx in range(result_count):
+                print(f' {self.results[idx]["value"]:>7.4f}   at byte number:{self.results[idx]["position"]}     {self.results[idx]["filename"]}')
 
 def results_add_rank(results):
     """Add ranking to sorted results list."""

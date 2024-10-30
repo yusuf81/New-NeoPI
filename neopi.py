@@ -366,7 +366,6 @@ class UsesEval(Test):
         if options.block_mode:
             for x in range(count):
                 print(f' {self.results[x]["value"]:>7.4f}   at byte number:{self.results[x]["position"]}     {self.results[x]["filename"]}')
-        return
 
 class Compression(Test):
     """Generator finds compression ratio"""

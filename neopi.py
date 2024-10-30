@@ -126,34 +126,32 @@ class LanguageIC(Test):
         self.ic_total_results = ic_total
         return 0
 
-    def calculate(self, file_data, file_path):
-        if not data or (len(data) == 1):
+    def calculate(self, input_data, filepath):
+        """Calculate Index of Coincidence for input data."""
+        if not input_data or (len(input_data) == 1):
             return 0
         char_count = 0
         total_char_count = 0
 
-        for x in range(256):
-            char = bytes([x])
-            charcount = data.count(char)
+        for byte_val in range(256):
+            char = bytes([byte_val])
+            charcount = input_data.count(char)
             char_count += charcount * (charcount - 1)
             total_char_count += charcount
-        ic = float(char_count)/(total_char_count * (total_char_count - 1))
+        coincidence_index = float(char_count)/(total_char_count * (total_char_count - 1))
         if not options.block_mode:
-            self.results.append({"filename": filename, "value": ic})
-        self.calculate_char_count(data)
-        return ic
+            self.results.append({"filename": filepath, "value": coincidence_index})
+        self.calculate_char_count(input_data)
+        return coincidence_index
 
     def sort(self):
-        """Sort results by value and add ranking."""
-        """Sort results by value and add ranking."""
         """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
 
     def printer(self, result_count):
         """Print top results up to specified count."""
-        """Print top results up to count."""
-        self.calculate_IC()
+        self.calculate_ic()
         print("\n[[ Average IC for Search ]]")
         print(self.ic_total_results)
         print(f"\n[[ Top {result_count} lowest IC files ]]")
@@ -177,23 +175,26 @@ class Entropy(Test):
         self.results = []
         self.high_is_bad = True
 
-    def calculate(self, data, filename):
-        if not data:
+    def calculate(self, input_data, filepath):
+        """Calculate entropy for given input data."""
+        if not input_data:
             return 0
         entropy = 0
-        for x in range(256):
-            p_x = float(data.count(bytes([x]))) / len(data)
+        for byte_val in range(256):
+            p_x = float(input_data.count(bytes([byte_val]))) / len(input_data)
             if p_x > 0:
                 entropy += - p_x * math.log(p_x, 2)
         if not options.block_mode:
-            self.results.append({"filename": filename, "value": entropy})
+            self.results.append({"filename": filepath, "value": entropy})
         return entropy
 
     def sort(self):
+        """Sort results by entropy value in descending order."""
         self.results.sort(key=lambda item: item["value"], reverse=True)
         self.results = results_add_rank(self.results)
 
-    def printer(self, count):
+    def printer(self, result_count):
+        """Print top entropy results."""
         print(f"\n[[ Top {count} entropic files for a given search ]]")
         if count > len(self.results):
             count = len(self.results)

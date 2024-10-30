@@ -35,7 +35,7 @@ class Test:
 
     def calculate(self, data, filename):
         """Calculate metric for given data. Should be overridden by child classes."""
-        print("In parent's calculate, this should have been overridden by child!)")
+        raise NotImplementedError("Calculate method must be implemented by child class")
 
     def block_calculate(self, blocksize, data, filename):
         """Calculate metric for blocks of data of given size."""
@@ -75,8 +75,8 @@ class Test:
 
     def flag_alarm(self):
         """Flag suspicious files based on deviation from mean."""
-        self.calcMean()
-        self.calcStdDev()
+        self.calc_mean()
+        self.calc_std_dev() 
 
         flag_list = []
         for res in self.results:
@@ -211,7 +211,7 @@ class LongestWord(Test):
             return 0
         try:
             text_data = data.decode('utf-8', errors='ignore')
-        except:
+        except (UnicodeDecodeError, ValueError):
             return 0
         longest = 0
         words = re.split(r"[\s,\n,\r]", text_data)
@@ -377,13 +377,14 @@ class Compression(Test):
                 print(f' {self.results[x]["value"]:>7.4f}   at byte number:{self.results[x]["position"]}     {self.results[x]["filename"]}')
         return
 
-def resultsAddRank(results):
+def results_add_rank(results):
+    """Add ranking to sorted results list."""
     rank = 1
     offset = 1
-    previousValue = False
-    newList = []
+    previous_value = False
+    new_list = []
     for file in results:
-        if previousValue and previousValue != file["value"]:
+        if previous_value and previous_value != file["value"]:
             rank = offset
         file["rank"] = rank
         newList.append(file)
@@ -476,9 +477,9 @@ if __name__ == "__main__":
     csv_array = []
     csv_header = ["filename"]
 
-    fileCount = 0
-    fileIgnoreCount = 0
-    timeStart = time.time()
+    FILE_COUNT = 0
+    FILE_IGNORE_COUNT = 0
+    TIME_START = time.time()
 
     for test in tests:
         csv_header.append(test.__class__.__name__)

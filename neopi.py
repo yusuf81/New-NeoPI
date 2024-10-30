@@ -480,8 +480,8 @@ if __name__ == "__main__":
     csv_array = []
     csv_header = ["filename"]
 
-    file_count = 0 
-    file_ignore_count = 0
+    FILE_COUNT = 0 
+    FILE_IGNORE_COUNT = 0
     time_start = time.time()
 
     for test in tests:
@@ -497,12 +497,12 @@ if __name__ == "__main__":
             if options.unicode:
                 try:
                     text_data = data.decode('utf-8')
-                    asciiHighCount = sum(1 for c in text_data if ord(c) > 127)
-                    fileAsciiHighRatio = float(asciiHighCount) / float(len(text_data))
+                    ascii_high_count = sum(1 for c in text_data if ord(c) > 127)
+                    FILE_ASCII_HIGH_RATIO = float(ascii_high_count) / float(len(text_data))
                 except (UnicodeDecodeError, ValueError):
-                    fileAsciiHighRatio = 0
+                    FILE_ASCII_HIGH_RATIO = 0
 
-            if not options.unicode or fileAsciiHighRatio < 0.1:
+            if not options.unicode or FILE_ASCII_HIGH_RATIO < 0.1:
                 for test in tests:
                     if options.block_mode:
                         calculated_value = test.blockCalculate(options.block_mode, data, filename)
@@ -513,10 +513,10 @@ if __name__ == "__main__":
                     else:
                         csv_row.append(calculated_value["value"])
                         csv_row.append(calculated_value["position"])
-                    file_count = file_count + 1
+                    FILE_COUNT = FILE_COUNT + 1
                 csv_array.append(csv_row)
             else:
-                file_ignore_count = file_ignore_count + 1
+                FILE_IGNORE_COUNT = FILE_IGNORE_COUNT + 1
 
     if options.csv:
         csv_array.insert(0, csv_header)
@@ -526,8 +526,8 @@ if __name__ == "__main__":
 
     time_finish = time.time()
 
-    print(f"\n[[ Total files scanned: {file_count} ]]")
-    print(f"[[ Total files ignored: {file_ignore_count} ]]")
+    print(f"\n[[ Total files scanned: {FILE_COUNT} ]]")
+    print(f"[[ Total files ignored: {FILE_IGNORE_COUNT} ]]")
     print(f"[[ Scan Time: {time_finish - time_start:.2f} seconds ]]")
 
     rank_list = {}

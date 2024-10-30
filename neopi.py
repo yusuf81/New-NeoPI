@@ -267,7 +267,7 @@ class SignatureNasty(Test):
         signature_pattern = re.compile(
             r'(eval\(|file_put_contents|base64_decode|python_eval|exec\(|'
             r'passthru|popen|proc_open|pcntl|assert\(|system\(|shell)',
-            re.I)
+            re.I) 
         matches = re.findall(signature_pattern, input_text)
         if not options.block_mode:
             self.results.append({"filename": filepath, "value": len(matches)})
@@ -335,7 +335,7 @@ class UsesEval(Test):
     def __init__(self):
         super().__init__()
         self.results = []
-        self.highIsBad = True
+        self.high_is_bad = True
 
     def calculate(self, input_data, filepath):
         if not data:

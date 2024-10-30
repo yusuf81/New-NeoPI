@@ -100,17 +100,19 @@ class LanguageIC(Test):
         self.ic_total_results = ""
         self.high_is_bad = False
 
-    def calculate_char_count(self, data):
-        if not data:
+    def calculate_char_count(self, input_data):
+        """Calculate character frequency counts for input data."""
+        if not input_data:
             return 0
-        for x in range(256):
-            char = bytes([x])
-            charcount = data.count(char)
+        for byte_val in range(256):
+            char = bytes([byte_val])
+            charcount = input_data.count(char)
             self.char_count[char] += charcount
             self.total_char_count += charcount
-        return
+        return 0
 
     def calculate_ic(self):
+        """Calculate Index of Coincidence from character counts."""
         total = 0
         for val in self.char_count.values():
             if val == 0:
@@ -122,7 +124,7 @@ class LanguageIC(Test):
         except ZeroDivisionError:
             ic_total = 0
         self.ic_total_results = ic_total
-        return
+        return 0
 
     def calculate(self, file_data, file_path):
         if not data or (len(data) == 1):
@@ -161,13 +163,12 @@ class LanguageIC(Test):
             for idx in range(result_count):
                 print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
-            for x in range(count):
+            for idx in range(count):
                 print(
-                    f' {self.results[x]["value"]:>7.4f}   '
-                    f'at byte number:{self.results[x]["position"]}     '
-                    f'{self.results[x]["filename"]}'
+                    f' {self.results[idx]["value"]:>7.4f}   '
+                    f'at byte number:{self.results[idx]["position"]}     '
+                    f'{self.results[idx]["filename"]}'
                 )
-        return
 
 class Entropy(Test):
     """Class that calculates a file's Entropy"""

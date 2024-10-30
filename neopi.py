@@ -146,12 +146,12 @@ class LanguageIC(Test):
 
     def sort(self):
         """Sort results by match count in descending order."""
-        """Sort results by compression ratio in descending order."""
         """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
 
     def printer(self, result_count):
+        """Print top results up to specified count."""
         """Print top signature match results."""
         """Print top results up to specified count."""
         self.calculate_ic()
@@ -249,9 +249,14 @@ class LongestWord(Test):
                 print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
             for idx in range(result_count):
-                print(f' {self.results[idx]["value"]:>7.4f}   at byte number:{self.results[idx]["position"]}     {self.results[idx]["filename"]}')
+                print(
+                    f' {self.results[idx]["value"]:>7.4f}   '
+                    f'at byte number:{self.results[idx]["position"]}     '
+                    f'{self.results[idx]["filename"]}'
+                )
 
 class SignatureNasty(Test):
+    """Class that searches files for suspicious signatures."""
     def __init__(self):
         super().__init__()
         self.results = []
@@ -342,11 +347,10 @@ class UsesEval(Test):
         if not data:
             return 0
         try:
-            decoded_data = data.decode('utf-8', errors='ignore')
+            text_data = data.decode('utf-8', errors='ignore')
         except (UnicodeDecodeError, ValueError):
             return 0
-        eval_regex = re.compile(r'(eval\(\$(\w|\d))', re.I)
-        matches = re.findall(valid_regex, text_data)
+        matches = re.findall(r'(eval\(\$(\w|\d))', text_data, re.I)
         if not options.block_mode:
             self.results.append({"filename": filename, "value": len(matches)})
         return len(matches)
@@ -430,7 +434,7 @@ class SearchFile:
     def is_valid_file(self, filepath, regex):
         """Check if file matches search criteria."""
         return (os.path.exists(filepath) and
-                regex.search(os.path.basename(filepath)) and 
+                regex.search(os.path.basename(filepath)) and
                 os.path.getsize(filepath) > SMALLEST
             )
 

@@ -292,7 +292,11 @@ class SignatureNasty(Test):
                 print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
             for idx in range(result_count):
-                print(f' {self.results[idx]["value"]:>7.4f}   at byte number:{self.results[idx]["position"]}     {self.results[idx]["filename"]}')
+                print(
+                    f' {self.results[idx]["value"]:>7.4f}   '
+                    f'at byte number:{self.results[idx]["position"]}     '
+                    f'{self.results[idx]["filename"]}'
+                )
 
 class SignatureSuperNasty(Test):
     """Generator that searches a given file for SUPER-nasty expressions"""
@@ -370,7 +374,11 @@ class UsesEval(Test):
                 print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
             for idx in range(count):
-                print(f' {self.results[idx]["value"]:>7.4f}   at byte number:{self.results[idx]["position"]}     {self.results[idx]["filename"]}')
+                print(
+                    f' {self.results[idx]["value"]:>7.4f}   '
+                    f'at byte number:{self.results[idx]["position"]}     '
+                    f'{self.results[idx]["filename"]}'
+                )
 
 class Compression(Test):
     """Generator finds compression ratio"""

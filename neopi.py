@@ -81,7 +81,7 @@ class Test:
         flag_list = []
         for res in self.results:
             if dist(res["value"], self.mean) > (DEVIATION_THRESH)*self.stddev:
-                if (self.highIsBad and res["value"] > self.mean) or (not self.highIsBad and res["value"] < self.mean):
+                if (self.high_is_bad and res["value"] > self.mean) or (not self.high_is_bad and res["value"] < self.mean):
                     percentage = dist(res["value"], self.mean) / self.stddev if self.stddev > 0 else float("inf")
                     res["percentage"] = percentage
                     flag_list.append(res)
@@ -142,10 +142,12 @@ class LanguageIC(Test):
         return ic
 
     def sort(self):
+        """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
 
     def printer(self, count):
+        """Print top results up to count."""
         self.calculate_IC()
         print("\n[[ Average IC for Search ]]")
         print(self.ic_total_results)
@@ -185,7 +187,7 @@ class Entropy(Test):
 
     def sort(self):
         self.results.sort(key=lambda item: item["value"], reverse=True)
-        self.results = resultsAddRank(self.results)
+        self.results = results_add_rank(self.results)
 
     def printer(self, count):
         print(f"\n[[ Top {count} entropic files for a given search ]]")
@@ -204,7 +206,7 @@ class LongestWord(Test):
     def __init__(self):
         super().__init__()
         self.results = []
-        self.highIsBad = True
+        self.high_is_bad = True
 
     def calculate(self, data, filename):
         if not data:
@@ -477,9 +479,9 @@ if __name__ == "__main__":
     csv_array = []
     csv_header = ["filename"]
 
-    file_count = 0
-    file_ignore_count = 0
-    time_start = time.time()
+    FILE_COUNT = 0
+    FILE_IGNORE_COUNT = 0
+    TIME_START = time.time()
 
     for test in tests:
         csv_header.append(test.__class__.__name__)
@@ -496,7 +498,7 @@ if __name__ == "__main__":
                     text_data = data.decode('utf-8')
                     asciiHighCount = sum(1 for c in text_data if ord(c) > 127)
                     fileAsciiHighRatio = float(asciiHighCount) / float(len(text_data))
-                except:
+                except (UnicodeDecodeError, ValueError):
                     fileAsciiHighRatio = 0
 
             if not options.unicode or fileAsciiHighRatio < 0.1:

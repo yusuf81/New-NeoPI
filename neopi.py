@@ -55,7 +55,6 @@ class Test:
             elif min_entropy > calc_result:
                 min_entropy = calc_result
                 pos = i * blocksize
-                
         result = {"value": max_entropy if self.high_is_bad else min_entropy, "position": pos}
         self.results.append({"filename": filename, **result})
         return result
@@ -79,7 +78,7 @@ class Test:
         self.calcMean()
         self.calcStdDev()
 
-        flagList = []
+        flag_list = []
         for res in self.results:
             if dist(res["value"], self.mean) > (DEVIATION_THRESH)*self.stddev:
                 if (self.highIsBad and res["value"] > self.mean) or (not self.highIsBad and res["value"] < self.mean):
@@ -99,7 +98,7 @@ class LanguageIC(Test):
         self.total_char_count = 0
         self.results = []
         self.ic_total_results = ""
-        self.highIsBad = False
+        self.high_is_bad = False
 
     def calculate_char_count(self, data):
         if not data:
@@ -111,7 +110,7 @@ class LanguageIC(Test):
             self.total_char_count += charcount
         return
 
-    def calculate_IC(self):
+    def calculate_ic(self):
         total = 0
         for val in self.char_count.values():
             if val == 0:
@@ -120,7 +119,7 @@ class LanguageIC(Test):
 
         try:
             ic_total = float(total)/(self.total_char_count * (self.total_char_count - 1))
-        except:
+        except ZeroDivisionError:
             ic_total = 0
         self.ic_total_results = ic_total
         return
@@ -158,7 +157,11 @@ class LanguageIC(Test):
                 print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
         if options.block_mode:
             for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}   at byte number:{self.results[x]["position"]}     {self.results[x]["filename"]}')
+                print(
+                    f' {self.results[x]["value"]:>7.4f}   '
+                    f'at byte number:{self.results[x]["position"]}     '
+                    f'{self.results[x]["filename"]}'
+                )
         return
 
 class Entropy(Test):
@@ -389,6 +392,7 @@ def resultsAddRank(results):
     return newList
 
 def dist(x, y):
+    """Calculate absolute distance between two numbers."""
     return math.fabs(x-y)
 
 class SearchFile:
@@ -512,7 +516,7 @@ if __name__ == "__main__":
 
     if options.csv:
         csv_array.insert(0, csv_header)
-        with open(options.csv, "w", newline='') as f:
+        with open(options.csv, "w", newline='', encoding='utf-8') as f:
             fileOutput = csv.writer(f)
             fileOutput.writerows(csv_array)
 

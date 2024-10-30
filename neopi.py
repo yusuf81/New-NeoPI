@@ -124,7 +124,7 @@ class LanguageIC(Test):
         self.ic_total_results = ic_total
         return
 
-    def calculate(self, data, filename):
+    def calculate(self, file_data, file_path):
         if not data or (len(data) == 1):
             return 0
         char_count = 0
@@ -144,10 +144,12 @@ class LanguageIC(Test):
     def sort(self):
         """Sort results by value and add ranking."""
         """Sort results by value and add ranking."""
+        """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
 
-    def printer(self, count):
+    def printer(self, result_count):
+        """Print top results up to specified count."""
         """Print top results up to count."""
         self.calculate_IC()
         print("\n[[ Average IC for Search ]]")
@@ -156,8 +158,8 @@ class LanguageIC(Test):
         if count > len(self.results):
             count = len(self.results)
         if not options.block_mode:
-            for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
+            for idx in range(result_count):
+                print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
             for x in range(count):
                 print(
@@ -288,7 +290,7 @@ class SignatureSuperNasty(Test):
     def __init__(self):
         super().__init__()
         self.results = []
-        self.highIsBad = True
+        self.high_is_bad = True
 
     def calculate(self, data, filename):
         if not data:
@@ -331,7 +333,7 @@ class UsesEval(Test):
             return 0
         try:
             text_data = data.decode('utf-8', errors='ignore')
-        except:
+        except (UnicodeDecodeError, ValueError):
             return 0
         valid_regex = re.compile(r'(eval\(\$(\w|\d))', re.I)
         matches = re.findall(valid_regex, text_data)
@@ -402,9 +404,9 @@ def results_add_rank(results):
         offset = offset + 1
     return new_list
 
-def dist(x, y):
+def calculate_distance(value1, value2):
     """Calculate absolute distance between two numbers."""
-    return math.fabs(x-y)
+    return math.fabs(value1 - value2)
 
 class SearchFile:
     """Generator that searches a given filepath with an optional regular
@@ -469,7 +471,7 @@ if __name__ == "__main__":
 
     try:
         valid_regex = re.compile(options.regex)
-    except:
+    except re.error:
         parser.error("Invalid regular expression")
 
     tests = []

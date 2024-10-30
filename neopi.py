@@ -45,16 +45,16 @@ class Test:
         j = 0
         pos = 0
         for i in range(num_blocks):
-            block_data = data[j:j+blocksize]
-            j = j+blocksize
+            block_data = data[j:j+block_size]
+            j = j+block_size
             calc_result = self.calculate(block_data, filename)
             if self.high_is_bad:
                 if max_entropy <= calc_result:
                     max_entropy = calc_result
-                    pos = i * blocksize
+                    pos = i * block_size
             elif min_entropy > calc_result:
                 min_entropy = calc_result
-                pos = i * blocksize
+                pos = i * block_size
         result = {"value": max_entropy if self.high_is_bad else min_entropy, "position": pos}
         self.results.append({"filename": filename, **result})
         return result

@@ -261,7 +261,7 @@ class SignatureNasty(Test):
 
     def sort(self):
         self.results.sort(key=lambda item: item["value"], reverse=True)
-        self.results = resultsAddRank(self.results)
+        self.results = results_add_rank(self.results)
 
     def printer(self, count):
         print(f"\n[[ Top {count} signature match counts ]]")
@@ -297,7 +297,7 @@ class SignatureSuperNasty(Test):
 
     def sort(self):
         self.results.sort(key=lambda item: item["value"], reverse=True)
-        self.results = resultsAddRank(self.results)
+        self.results = results_add_rank(self.results)
 
     def printer(self, count):
         print(f"\n[[ Top {count} SUPER-signature match counts (These are usually bad!) ]]")
@@ -333,7 +333,7 @@ class UsesEval(Test):
 
     def sort(self):
         self.results.sort(key=lambda item: item["value"], reverse=True)
-        self.results = resultsAddRank(self.results)
+        self.results = results_add_rank(self.results)
 
     def printer(self, count):
         print(f"\n[[ Top {count} eval match counts ]]")
@@ -365,7 +365,7 @@ class Compression(Test):
 
     def sort(self):
         self.results.sort(key=lambda item: item["value"], reverse=True)
-        self.results = resultsAddRank(self.results)
+        self.results = results_add_rank(self.results)
 
     def printer(self, count):
         print(f"\n[[ Top {count} compression match counts ]]")

@@ -33,11 +33,11 @@ class Test:
         self.mean = 0
         self.stddev = 0
 
-    def calculate(self, file_data, file_path):
+    def calculate(self, input_data, filepath):
         """Calculate metric for given data. Should be overridden by child classes."""
         raise NotImplementedError("Calculate method must be implemented by child class")
 
-    def block_calculate(self, block_size, data, filename):
+    def block_calculate(self, block_size, input_data, filepath):
         """Calculate metric for blocks of data of given size."""
         num_blocks = int(math.ceil(len(data) / block_size))
         max_entropy = -9999
@@ -45,9 +45,9 @@ class Test:
         j = 0
         pos = 0
         for i in range(num_blocks):
-            block_data = data[j:j+block_size]
+            block_data = input_data[j:j+block_size]
             j = j+block_size
-            calc_result = self.calculate(block_data, filename)
+            calc_result = self.calculate(block_data, filepath)
             if self.high_is_bad:
                 if max_entropy <= calc_result:
                     max_entropy = calc_result
@@ -199,16 +199,15 @@ class Entropy(Test):
         if result_count > len(self.results):
             result_count = len(self.results)
         if not options.block_mode:
-            for x in range(result_count):
-                print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
+            for idx in range(result_count):
+                print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
-            for x in range(result_count):
+            for idx in range(result_count):
                 print(
-                    f' {self.results[x]["value"]:>7.4f}   '
-                    f'at byte number:{self.results[x]["position"]}     '
-                    f'{self.results[x]["filename"]}'
+                    f' {self.results[idx]["value"]:>7.4f}   '
+                    f'at byte number:{self.results[idx]["position"]}     '
+                    f'{self.results[idx]["filename"]}'
                 )
-        return
 
 class LongestWord(Test):
     """Class that determines the longest word for a particular file"""
@@ -217,11 +216,11 @@ class LongestWord(Test):
         self.results = []
         self.high_is_bad = True
 
-    def calculate(self, data, filename):
-        if not data:
+    def calculate(self, input_data, filepath):
+        if not input_data:
             return 0
         try:
-            text_data = data.decode('utf-8', errors='ignore')
+            text_data = input_data.decode('utf-8', errors='ignore')
         except (UnicodeDecodeError, ValueError):
             return 0
         longest = 0

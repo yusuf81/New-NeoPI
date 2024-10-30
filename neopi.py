@@ -55,9 +55,9 @@ class Test:
             elif min_entropy > calc_result:
                 min_entropy = calc_result
                 pos = i * block_size
-        result = {"value": max_entropy if self.high_is_bad else min_entropy, "position": pos}
-        self.results.append({"filename": filename, **result})
-        return result
+        result_dict = {"value": max_entropy if self.high_is_bad else min_entropy, "position": pos}
+        self.results.append({"filename": filename, **result_dict})
+        return result_dict
 
     def calc_mean(self):
         """Calculate mean of all results."""
@@ -145,12 +145,14 @@ class LanguageIC(Test):
         return coincidence_index
 
     def sort(self):
+        """Sort results by match count in descending order."""
         """Sort results by compression ratio in descending order."""
         """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
 
     def printer(self, result_count):
+        """Print top signature match results."""
         """Print top results up to specified count."""
         self.calculate_ic()
         print("\n[[ Average IC for Search ]]")
@@ -221,7 +223,7 @@ class LongestWord(Test):
         if not input_data:
             return 0
         try:
-            text_data = input_data.decode('utf-8', errors='ignore')
+            decoded_data = input_data.decode('utf-8', errors='ignore')
         except (UnicodeDecodeError, ValueError):
             return 0
         longest = 0
@@ -250,7 +252,6 @@ class LongestWord(Test):
                 print(f' {self.results[idx]["value"]:>7.4f}   at byte number:{self.results[idx]["position"]}     {self.results[idx]["filename"]}')
 
 class SignatureNasty(Test):
-    """Generator that searches a given file for nasty expressions"""
     def __init__(self):
         super().__init__()
         self.results = []
@@ -341,10 +342,10 @@ class UsesEval(Test):
         if not data:
             return 0
         try:
-            text_data = data.decode('utf-8', errors='ignore')
+            decoded_data = data.decode('utf-8', errors='ignore')
         except (UnicodeDecodeError, ValueError):
             return 0
-        valid_regex = re.compile(r'(eval\(\$(\w|\d))', re.I)
+        eval_regex = re.compile(r'(eval\(\$(\w|\d))', re.I)
         matches = re.findall(valid_regex, text_data)
         if not options.block_mode:
             self.results.append({"filename": filename, "value": len(matches)})
@@ -361,11 +362,11 @@ class UsesEval(Test):
         if result_count > len(self.results):
             result_count = len(self.results)
         if not options.block_mode:
-            for x in range(result_count):
-                print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
+            for idx in range(result_count):
+                print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
-            for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}   at byte number:{self.results[x]["position"]}     {self.results[x]["filename"]}')
+            for idx in range(count):
+                print(f' {self.results[idx]["value"]:>7.4f}   at byte number:{self.results[idx]["position"]}     {self.results[idx]["filename"]}')
 
 class Compression(Test):
     """Generator finds compression ratio"""

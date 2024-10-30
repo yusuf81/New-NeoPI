@@ -195,14 +195,14 @@ class Entropy(Test):
 
     def printer(self, result_count):
         """Print top entropy results."""
-        print(f"\n[[ Top {count} entropic files for a given search ]]")
-        if count > len(self.results):
-            count = len(self.results)
+        print(f"\n[[ Top {result_count} entropic files for a given search ]]")
+        if result_count > len(self.results):
+            result_count = len(self.results)
         if not options.block_mode:
-            for x in range(count):
+            for x in range(result_count):
                 print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
         if options.block_mode:
-            for x in range(count):
+            for x in range(result_count):
                 print(
                     f' {self.results[x]["value"]:>7.4f}   '
                     f'at byte number:{self.results[x]["position"]}     '

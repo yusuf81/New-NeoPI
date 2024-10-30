@@ -143,7 +143,7 @@ class LanguageIC(Test):
 
     def sort(self):
         self.results.sort(key=lambda item: item["value"])
-        self.results = resultsAddRank(self.results)
+        self.results = results_add_rank(self.results)
 
     def printer(self, count):
         self.calculate_IC()
@@ -477,9 +477,9 @@ if __name__ == "__main__":
     csv_array = []
     csv_header = ["filename"]
 
-    FILE_COUNT = 0
-    FILE_IGNORE_COUNT = 0
-    TIME_START = time.time()
+    file_count = 0
+    file_ignore_count = 0
+    time_start = time.time()
 
     for test in tests:
         csv_header.append(test.__class__.__name__)
@@ -510,10 +510,10 @@ if __name__ == "__main__":
                     else:
                         csv_row.append(calculated_value["value"])
                         csv_row.append(calculated_value["position"])
-                    fileCount = fileCount + 1
+                    file_count = file_count + 1
                 csv_array.append(csv_row)
             else:
-                fileIgnoreCount = fileIgnoreCount + 1
+                file_ignore_count = file_ignore_count + 1
 
     if options.csv:
         csv_array.insert(0, csv_header)
@@ -523,9 +523,9 @@ if __name__ == "__main__":
 
     timeFinish = time.time()
 
-    print(f"\n[[ Total files scanned: {fileCount} ]]")
-    print(f"[[ Total files ignored: {fileIgnoreCount} ]]")
-    print(f"[[ Scan Time: {timeFinish - timeStart:.2f} seconds ]]")
+    print(f"\n[[ Total files scanned: {file_count} ]]")
+    print(f"[[ Total files ignored: {file_ignore_count} ]]")
+    print(f"[[ Scan Time: {timeFinish - time_start:.2f} seconds ]]")
 
     rank_list = {}
     for test in tests:

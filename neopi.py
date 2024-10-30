@@ -145,6 +145,7 @@ class LanguageIC(Test):
         return coincidence_index
 
     def sort(self):
+        """Sort results by match count in descending order."""
         """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
@@ -319,12 +320,15 @@ class SignatureSuperNasty(Test):
         if result_count > len(self.results):
             result_count = len(self.results)
         if not options.block_mode:
-            for x in range(result_count):
-                print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
+            for idx in range(result_count):
+                print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
             for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}   at byte number:{self.results[x]["position"]}     {self.results[x]["filename"]}')
-        return
+                print(
+                    f' {self.results[x]["value"]:>7.4f}   '
+                    f'at byte number:{self.results[x]["position"]}     '
+                    f'{self.results[x]["filename"]}'
+                )
 
 class UsesEval(Test):
     """Generator that searches a given file for nasty eval with variable"""
@@ -333,7 +337,7 @@ class UsesEval(Test):
         self.results = []
         self.highIsBad = True
 
-    def calculate(self, data, filename):
+    def calculate(self, input_data, filepath):
         if not data:
             return 0
         try:

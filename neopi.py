@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
-# Name: neopi.py
-# Description: Utility to scan a file path for encrypted and obfuscated files
-# Authors: Ben Hagen (ben.hagen@neohapsis.com)
-#         Scott Behrens (scott.behrens@neohapsis.com)
-#
-# Date: 11/4/2010
-# Modified for Python 3 compatibility
+"""
+Utility to scan a file path for encrypted and obfuscated files.
+
+Originally created by:
+Ben Hagen (ben.hagen@neohapsis.com)
+Scott Behrens (scott.behrens@neohapsis.com)
+
+Date: 11/4/2010
+Modified for Python 3 compatibility
+"""
 
 import math
-import sys
 import os
 import re
 import csv
@@ -24,50 +26,56 @@ DEVIATION_THRESH = 1.5  # percentage deviation before alarm will sound
 
 class Test:
     """Base class for all tests"""
+    def __init__(self):
+        # high_is_bad means the higher the metric, the more suspicious it is
+        self.high_is_bad = True
+        self.results = []
+        self.mean = 0
+        self.stddev = 0
+
     def calculate(self, data, filename):
+        """Calculate metric for given data. Should be overridden by child classes."""
         print("In parent's calculate, this should have been overridden by child!)")
 
-    def __init__(self):
-        # highIsBad means the higher the metric, the more suspicious it is
-        self.highIsBad = True
-
-    def blockCalculate(self, blocksize, data, filename):
-        noB = int(math.ceil(len(data)/blocksize))
-        maxEntropy = -9999
-        minEntropy = 9999
+    def block_calculate(self, blocksize, data, filename):
+        """Calculate metric for blocks of data of given size."""
+        num_blocks = int(math.ceil(len(data)/blocksize))
+        max_entropy = -9999
+        min_entropy = 9999
         j = 0
         pos = 0
-        for i in range(noB):
-            Blockdata = data[j:j+blocksize]
+        for i in range(num_blocks):
+            block_data = data[j:j+blocksize]
             j = j+blocksize
-            if self.highIsBad:
-                if maxEntropy <= self.calculate(Blockdata, filename):
-                    maxEntropy = self.calculate(Blockdata, filename)
+            calc_result = self.calculate(block_data, filename)
+            if self.high_is_bad:
+                if max_entropy <= calc_result:
+                    max_entropy = calc_result
                     pos = i * blocksize
-            if not self.highIsBad:
-                if minEntropy > self.calculate(Blockdata, filename):
-                    minEntropy = self.calculate(Blockdata, filename)
-                    pos = i * blocksize
-        if self.highIsBad:
-            self.results.append({"filename": filename, "value": maxEntropy, "position": pos})
-            return {"value": maxEntropy, "position": pos}
-        else:
-            self.results.append({"filename": filename, "value": minEntropy, "position": pos})
-            return {"value": minEntropy, "position": pos}
+            elif min_entropy > calc_result:
+                min_entropy = calc_result
+                pos = i * blocksize
+                
+        result = {"value": max_entropy if self.high_is_bad else min_entropy, "position": pos}
+        self.results.append({"filename": filename, **result})
+        return result
 
-    def calcMean(self):
-        resTotal = 0
+    def calc_mean(self):
+        """Calculate mean of all results."""
+        res_total = 0
         for res in self.results:
-            resTotal += res["value"]
-        self.mean = resTotal / len(self.results)
+            res_total += res["value"]
+        self.mean = res_total / len(self.results)
 
-    def calcStdDev(self):
-        squareTotal = 0
+    def calc_std_dev(self):
+        """Calculate standard deviation of results."""
+        square_total = 0
         for res in self.results:
-            squareTotal += math.pow(res["value"] - self.mean, 2)
-        self.stddev = math.sqrt(squareTotal / len(self.results))
+            square_total += math.pow(res["value"] - self.mean, 2)
+        self.stddev = math.sqrt(square_total / len(self.results))
 
-    def flagAlarm(self):
+    def flag_alarm(self):
+        """Flag suspicious files based on deviation from mean."""
         self.calcMean()
         self.calcStdDev()
 

@@ -232,20 +232,21 @@ class LongestWord(Test):
         return longest
 
     def sort(self):
+        """Sort results by word length in descending order."""
         self.results.sort(key=lambda item: item["value"], reverse=True)
         self.results = results_add_rank(self.results)
 
-    def printer(self, count):
-        print(f"\n[[ Top {count} longest word files ]]")
-        if count > len(self.results):
-            count = len(self.results)
+    def printer(self, result_count):
+        """Print top results up to specified count."""
+        print(f"\n[[ Top {result_count} longest word files ]]")
+        if result_count > len(self.results):
+            result_count = len(self.results)
         if not options.block_mode:
-            for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
+            for idx in range(result_count):
+                print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
-            for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}   at byte number:{self.results[x]["position"]}     {self.results[x]["filename"]}')
-        return
+            for idx in range(result_count):
+                print(f' {self.results[idx]["value"]:>7.4f}   at byte number:{self.results[idx]["position"]}     {self.results[idx]["filename"]}')
 
 class SignatureNasty(Test):
     """Generator that searches a given file for nasty expressions"""
@@ -254,11 +255,11 @@ class SignatureNasty(Test):
         self.results = []
         self.high_is_bad = True
 
-    def calculate(self, data, filename):
+    def calculate(self, input_data, filepath):
         if not data:
             return 0
         try:
-            text_data = data.decode('utf-8', errors='ignore')
+            decoded_text = data.decode('utf-8', errors='ignore')
         except (UnicodeDecodeError, ValueError):
             return 0
         valid_regex = re.compile(
@@ -501,7 +502,7 @@ if __name__ == "__main__":
     csv_array = []
     csv_header = ["filename"]
 
-    FILE_COUNT = 0 
+    FILE_COUNT = 0
     FILE_IGNORE_COUNT = 0
     time_start = time.time()
 
@@ -519,7 +520,7 @@ if __name__ == "__main__":
                 try:
                     text_data = data.decode('utf-8')
                     ascii_high_count = sum(1 for c in text_data if ord(c) > 127)
-                    FILE_ASCII_HIGH_RATIO = (float(ascii_high_count) / 
+                    FILE_ASCII_HIGH_RATIO = (float(ascii_high_count) /
                                            float(len(text_data)))
                 except (UnicodeDecodeError, ValueError):
                     FILE_ASCII_HIGH_RATIO = 0

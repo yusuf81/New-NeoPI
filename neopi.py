@@ -84,10 +84,10 @@ class Test:
                 if (self.highIsBad and res["value"] > self.mean) or (not self.highIsBad and res["value"] < self.mean):
                     percentage = dist(res["value"], self.mean) / self.stddev if self.stddev > 0 else float("inf")
                     res["percentage"] = percentage
-                    flagList.append(res)
+                    flag_list.append(res)
 
-        flagList.sort(key=lambda item: item["percentage"])
-        for res in flagList:
+        flag_list.sort(key=lambda item: item["percentage"])
+        for res in flag_list:
             print(f' {res["percentage"]:>7.4f}       {res["filename"]}')
 
 class LanguageIC(Test):

@@ -225,7 +225,7 @@ class LongestWord(Test):
 
     def sort(self):
         self.results.sort(key=lambda item: item["value"], reverse=True)
-        self.results = resultsAddRank(self.results)
+        self.results = results_add_rank(self.results)
 
     def printer(self, count):
         print(f"\n[[ Top {count} longest word files ]]")
@@ -479,9 +479,9 @@ if __name__ == "__main__":
     csv_array = []
     csv_header = ["filename"]
 
-    FILE_COUNT = 0
-    FILE_IGNORE_COUNT = 0
-    TIME_START = time.time()
+    file_count = 0 
+    file_ignore_count = 0
+    time_start = time.time()
 
     for test in tests:
         csv_header.append(test.__class__.__name__)
@@ -523,11 +523,11 @@ if __name__ == "__main__":
             fileOutput = csv.writer(f)
             fileOutput.writerows(csv_array)
 
-    timeFinish = time.time()
+    time_finish = time.time()
 
     print(f"\n[[ Total files scanned: {file_count} ]]")
     print(f"[[ Total files ignored: {file_ignore_count} ]]")
-    print(f"[[ Scan Time: {timeFinish - time_start:.2f} seconds ]]")
+    print(f"[[ Scan Time: {time_finish - time_start:.2f} seconds ]]")
 
     rank_list = {}
     for test in tests:

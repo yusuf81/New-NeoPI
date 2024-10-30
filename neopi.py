@@ -199,7 +199,11 @@ class Entropy(Test):
                 print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
         if options.block_mode:
             for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}   at byte number:{self.results[x]["position"]}     {self.results[x]["filename"]}')
+                print(
+                    f' {self.results[x]["value"]:>7.4f}   '
+                    f'at byte number:{self.results[x]["position"]}     '
+                    f'{self.results[x]["filename"]}'
+                )
         return
 
 class LongestWord(Test):
@@ -254,7 +258,10 @@ class SignatureNasty(Test):
             text_data = data.decode('utf-8', errors='ignore')
         except (UnicodeDecodeError, ValueError):
             return 0
-        valid_regex = re.compile(r'(eval\(|file_put_contents|base64_decode|python_eval|exec\(|passthru|popen|proc_open|pcntl|assert\(|system\(|shell)', re.I)
+        valid_regex = re.compile(
+            r'(eval\(|file_put_contents|base64_decode|python_eval|exec\(|'
+            r'passthru|popen|proc_open|pcntl|assert\(|system\(|shell)',
+            re.I)
         matches = re.findall(valid_regex, text_data)
         if not options.block_mode:
             self.results.append({"filename": filename, "value": len(matches)})
@@ -405,7 +412,6 @@ class SearchFile:
 
     def __init__(self, follow_symlinks):
         self.follow_symlinks = follow_symlinks
-        
     def is_valid_file(self, filepath, regex):
         """Check if file matches search criteria."""
         return (os.path.exists(filepath) and
@@ -419,7 +425,6 @@ class SearchFile:
                 filename = os.path.join(root, file)
                 if not valid_regex.search(file) or os.path.getsize(filename) <= SMALLEST:
                     continue
-                    
                 try:
                     with open(filename, 'rb') as f:
                         data = f.read()
@@ -446,8 +451,16 @@ if __name__ == "__main__":
     parser.add_argument("-S", "--supersignature", action="store_true", help="Run SUPER-signature test")
     parser.add_argument("-u", "--unicode", action="store_true", help="Skip over unicode-y/UTF'y files")
     parser.add_argument("-f", "--follow-links", action="store_true", help="Follow symbolic links")
-    parser.add_argument("-m", "--alarm-mode", type=float, help="Alarm mode outputs flags only files with high deviation")
-    parser.add_argument("-b", "--block-mode", type=int, help="Block mode calculates the tests selected for the specified block sizes in each file")
+    parser.add_argument(
+        "-m", "--alarm-mode",
+        type=float,
+        help="Alarm mode outputs flags only files with high deviation"
+    )
+    parser.add_argument(
+        "-b", "--block-mode",
+        type=int,
+        help="Block mode calculates the tests selected for the specified block sizes in each file"
+    )
 
     options = parser.parse_args()
 
@@ -502,7 +515,8 @@ if __name__ == "__main__":
                 try:
                     text_data = data.decode('utf-8')
                     ascii_high_count = sum(1 for c in text_data if ord(c) > 127)
-                    FILE_ASCII_HIGH_RATIO = float(ascii_high_count) / float(len(text_data))
+                    FILE_ASCII_HIGH_RATIO = (float(ascii_high_count) / 
+                                           float(len(text_data)))
                 except (UnicodeDecodeError, ValueError):
                     FILE_ASCII_HIGH_RATIO = 0
 

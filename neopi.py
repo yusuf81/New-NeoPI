@@ -288,7 +288,7 @@ class SignatureSuperNasty(Test):
             return 0
         try:
             text_data = data.decode('utf-8', errors='ignore')
-        except:
+        except UnicodeDecodeError:
             return 0
         valid_regex = re.compile(r'(@\$_\[\]=|\$_=@\$_GET|\$_\[\+""\]=)', re.I)
         matches = re.findall(valid_regex, text_data)
@@ -405,21 +405,25 @@ class SearchFile:
 
     def __init__(self, follow_symlinks):
         self.follow_symlinks = follow_symlinks
+        
+    def is_valid_file(self, filepath, regex):
+        """Check if file matches search criteria."""
+        return (os.path.exists(filepath) and
+                regex.search(os.path.basename(filepath)) and
+                os.path.getsize(filepath) > SMALLEST)
 
     def search_file_path(self, args, valid_regex):
-        for root, dirs, files in os.walk(args[0], followlinks=self.follow_symlinks):
+        """Search files in path matching regex pattern."""
+        for root, _, files in os.walk(args[0], followlinks=self.follow_symlinks):
             for file in files:
                 filename = os.path.join(root, file)
+                if not valid_regex.search(file) or os.path.getsize(filename) <= SMALLEST:
+                    continue
+                    
                 try:
-                    if valid_regex.search(file) and os.path.getsize(filename) > SMALLEST:
-                        try:
-                            with open(os.path.join(root, file), 'rb') as f:
-                                data = f.read()
-                        except (OSError, IOError):
-                            data = False
-                            raise
-                        finally:
-                            yield data, filename
+                    with open(filename, 'rb') as f:
+                        data = f.read()
+                    yield data, filename
                 except (OSError, IOError):
                     print(f"Could not read file :: {root}/{file}")
 

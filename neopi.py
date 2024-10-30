@@ -387,10 +387,10 @@ def results_add_rank(results):
         if previous_value and previous_value != file["value"]:
             rank = offset
         file["rank"] = rank
-        newList.append(file)
-        previousValue = file["value"]
+        new_list.append(file)
+        previous_value = file["value"]
         offset = offset + 1
-    return newList
+    return new_list
 
 def dist(x, y):
     """Calculate absolute distance between two numbers."""

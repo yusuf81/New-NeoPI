@@ -80,9 +80,9 @@ class Test:
 
         flag_list = []
         for res in self.results:
-            if dist(res["value"], self.mean) > (DEVIATION_THRESH)*self.stddev:
+            if calculate_distance(res["value"], self.mean) > (DEVIATION_THRESH)*self.stddev:
                 if (self.high_is_bad and res["value"] > self.mean) or (not self.high_is_bad and res["value"] < self.mean):
-                    percentage = dist(res["value"], self.mean) / self.stddev if self.stddev > 0 else float("inf")
+                    percentage = calculate_distance(res["value"], self.mean) / self.stddev if self.stddev > 0 else float("inf")
                     res["percentage"] = percentage
                     flag_list.append(res)
 
@@ -154,9 +154,9 @@ class LanguageIC(Test):
         self.calculate_IC()
         print("\n[[ Average IC for Search ]]")
         print(self.ic_total_results)
-        print(f"\n[[ Top {count} lowest IC files ]]")
-        if count > len(self.results):
-            count = len(self.results)
+        print(f"\n[[ Top {result_count} lowest IC files ]]")
+        if result_count > len(self.results):
+            result_count = len(self.results)
         if not options.block_mode:
             for idx in range(result_count):
                 print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')

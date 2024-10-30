@@ -273,17 +273,16 @@ class SignatureNasty(Test):
         self.results.sort(key=lambda item: item["value"], reverse=True)
         self.results = results_add_rank(self.results)
 
-    def printer(self, count):
-        print(f"\n[[ Top {count} signature match counts ]]")
-        if count > len(self.results):
-            count = len(self.results)
+    def printer(self, result_count):
+        print(f"\n[[ Top {result_count} signature match counts ]]")
+        if result_count > len(self.results):
+            result_count = len(self.results)
         if not options.block_mode:
-            for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}        {self.results[x]["filename"]}')
+            for idx in range(result_count):
+                print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
-            for x in range(count):
-                print(f' {self.results[x]["value"]:>7.4f}   at byte number:{self.results[x]["position"]}     {self.results[x]["filename"]}')
-        return
+            for idx in range(result_count):
+                print(f' {self.results[idx]["value"]:>7.4f}   at byte number:{self.results[idx]["position"]}     {self.results[idx]["filename"]}')
 
 class SignatureSuperNasty(Test):
     """Generator that searches a given file for SUPER-nasty expressions"""
@@ -420,19 +419,19 @@ class SearchFile:
                 regex.search(os.path.basename(filepath)) and
                 os.path.getsize(filepath) > SMALLEST)
 
-    def search_file_path(self, args, valid_regex):
+    def search_file_path(self, args, pattern):
         """Search files in path matching regex pattern."""
         for root, _, files in os.walk(args[0], followlinks=self.follow_symlinks):
-            for file in files:
-                filename = os.path.join(root, file)
-                if not valid_regex.search(file) or os.path.getsize(filename) <= SMALLEST:
+            for filepath in files:
+                full_path = os.path.join(root, filepath)
+                if not pattern.search(filepath) or os.path.getsize(full_path) <= SMALLEST:
                     continue
                 try:
-                    with open(filename, 'rb') as f:
-                        data = f.read()
-                    yield data, filename
+                    with open(full_path, 'rb') as file_handle:
+                        file_data = file_handle.read()
+                    yield file_data, full_path
                 except (OSError, IOError):
-                    print(f"Could not read file :: {root}/{file}")
+                    print(f"Could not read file :: {root}/{filepath}")
 
 if __name__ == "__main__":
     print("""

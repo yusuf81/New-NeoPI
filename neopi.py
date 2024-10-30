@@ -376,12 +376,12 @@ class Compression(Test):
 
     def calculate(self, input_data, filepath):
         """Calculate compression ratio for given data."""
-        if not file_data:
+        if not input_data:
             return 0
-        compressed = zlib.compress(file_data)
-        ratio = float(len(compressed)) / float(len(file_data))
+        compressed = zlib.compress(input_data)
+        ratio = float(len(compressed)) / float(len(input_data))
         if not options.block_mode:
-            self.results.append({"filename": file_path, "value": ratio})
+            self.results.append({"filename": filepath, "value": ratio})
         return ratio
 
     def sort(self):

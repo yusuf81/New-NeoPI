@@ -19,6 +19,8 @@ import zlib
 import time
 from collections import defaultdict
 import argparse
+from multiprocessing import Pool
+from functools import lru_cache
 
 # Globals
 SMALLEST = 1  # Smallest filesize to check in bytes
@@ -451,19 +453,32 @@ class SearchFile:
                 os.path.getsize(filepath) > SMALLEST
             )
 
+    @lru_cache(maxsize=1024)
+    def read_file(self, filepath):
+        """Read file contents with caching."""
+        try:
+            with open(filepath, 'rb') as file_handle:
+                return file_handle.read()
+        except (OSError, IOError):
+            print(f"Could not read file :: {filepath}")
+            return None
+
     def search_file_path(self, args, pattern):
         """Search files in path matching regex pattern."""
-        for root, _, files in os.walk(args[0], followlinks=self.follow_symlinks):
-            for filepath in files:
-                full_path = os.path.join(root, filepath)
-                if not pattern.search(filepath) or os.path.getsize(full_path) <= SMALLEST:
-                    continue
-                try:
-                    with open(full_path, 'rb') as file_handle:
-                        file_data = file_handle.read()
-                    yield file_data, full_path
-                except (OSError, IOError):
-                    print(f"Could not read file :: {root}/{filepath}")
+        def process_file(filepath):
+            if not pattern.search(os.path.basename(filepath)) or os.path.getsize(filepath) <= SMALLEST:
+                return None
+            file_data = self.read_file(filepath)
+            if file_data:
+                return file_data, filepath
+            return None
+
+        with Pool() as pool:
+            for root, _, files in os.walk(args[0], followlinks=self.follow_symlinks):
+                filepaths = [os.path.join(root, f) for f in files]
+                for result in pool.imap_unordered(process_file, filepaths):
+                    if result:
+                        yield result
 
 if __name__ == "__main__":
     print("""

@@ -5,7 +5,7 @@ import os
 import re
 import time
 import csv
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 from .search import SearchFile
 from .tests import (
     Test,
@@ -19,7 +19,7 @@ def create_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Utility to scan a file path for encrypted and obfuscated files"
     )
-    
+
     # Required arguments
     parser.add_argument(
         "directory",
@@ -37,9 +37,16 @@ def create_arg_parser() -> argparse.ArgumentParser:
         help="Generate CSV outfile",
         metavar="FILECSV"
     )
-    parser.add_argument("-a", "--all", action="store_true",
-                       help="Run all (useful) tests [Entropy, Longest Word, IC, Signature]")
-    parser.add_argument("-z", "--zlib", action="store_true", help="Run compression Test")
+    parser.add_argument(
+        "-a", "--all",
+        action="store_true",
+        help="Run all (useful) tests [Entropy, Longest Word, IC, Signature]"
+    )
+    parser.add_argument(
+        "-z", "--zlib",
+        action="store_true",
+        help="Run compression Test"
+    )
     parser.add_argument("-e", "--entropy", action="store_true", help="Run entropy Test")
     parser.add_argument("-E", "--eval", action="store_true", help="Run signature test for the eval")
     parser.add_argument("-l", "--longestword", action="store_true", help="Run longest word test")
@@ -49,7 +56,7 @@ def create_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("-u", "--unicode", action="store_true", help="Skip over unicode-y/UTF'y files")
     parser.add_argument("-f", "--follow-links", action="store_true", help="Follow symbolic links")
     parser.add_argument(
-        "-m", "--alarm-mode", 
+        "-m", "--alarm-mode",
         type=float,
         help="Alarm mode outputs flags only files with high deviation"
     )
@@ -71,9 +78,8 @@ def get_tests(args: argparse.Namespace) -> List[Test]:
         'eval': UsesEval,
         'zlib': Compression
     }
-    
+
     tests = []
-    
     if args.all:
         tests.extend([
             LanguageIC(), Entropy(), LongestWord(),
@@ -84,7 +90,7 @@ def get_tests(args: argparse.Namespace) -> List[Test]:
     for arg_name, test_class in test_map.items():
         if getattr(args, arg_name, False):
             tests.append(test_class())
-            
+
     return tests
 
 def write_csv(filename: str, header: List[str], rows: List[List[Any]]) -> None:
@@ -117,6 +123,12 @@ def process_file(data: bytes, filename: str, tests: List[Test], args: argparse.N
             csv_row.append(result)
             
     return csv_row
+
+def print_summary(file_count: int, file_ignore_count: int, scan_time: float) -> None:
+    """Print summary statistics."""
+    print(f"\n[[ Total files scanned: {file_count} ]]")
+    print(f"[[ Total files ignored: {file_ignore_count} ]]")
+    print(f"[[ Scan Time: {scan_time:.2f} seconds ]]")
 
 def print_results(tests: List[Test], rank_list: Dict[str, float], args: argparse.Namespace) -> None:
     """Print test results and rankings."""
@@ -176,8 +188,8 @@ def main() -> int:
             csv_header.append("position")
 
     # Process files
+
     time_start = time.time()
-    
     for data, filename in locator.search_file_path([args.directory], valid_regex):
         if not data:
             continue
@@ -193,15 +205,11 @@ def main() -> int:
     if args.csv:
         write_csv(args.csv, csv_header, csv_array)
 
-    # Print summary
+    # Print results
     time_finish = time.time()
     scan_time = time_finish - time_start
-
-    print(f"\n[[ Total files scanned: {file_count} ]]")
-    print(f"[[ Total files ignored: {file_ignore_count} ]]")
-    print(f"[[ Scan Time: {scan_time:.2f} seconds ]]")
-
-    # Print detailed results
+    
+    print_summary(file_count, file_ignore_count, scan_time)
     print_results(tests, rank_list, args)
 
     return 0

@@ -1,7 +1,6 @@
 """Base test class definition."""
 
 import math
-from collections import defaultdict
 
 class Test:
     """Base class for all tests"""
@@ -11,7 +10,6 @@ class Test:
         self.results = []
         self.mean = 0
         self.stddev = 0
-        
     def calculate(self, input_data, filepath):
         """Calculate metric for given data. Should be overridden by child classes."""
         raise NotImplementedError("Calculate method must be implemented by child class")
@@ -20,12 +18,10 @@ class Test:
         """Calculate metric for blocks of data of given size."""
         if not input_data:
             return {"value": 0, "position": 0}
-            
         num_blocks = int(math.ceil(len(input_data) / block_size))
         max_entropy = float('-inf')
         min_entropy = float('inf')
         pos = 0
-        
         for i in range(num_blocks):
             start = i * block_size
             block_data = input_data[start:start + block_size]
@@ -38,7 +34,6 @@ class Test:
             elif min_entropy > calc_result:
                 min_entropy = calc_result
                 pos = start
-                
         result = {
             "value": max_entropy if self.high_is_bad else min_entropy,
             "position": pos
@@ -84,7 +79,6 @@ class Test:
         
         if not self.results:
             return
-            
         self.results.sort(
             key=lambda x: x["value"],
             reverse=self.high_is_bad
@@ -92,7 +86,6 @@ class Test:
         
         rank = 1
         prev_value = None
-        
         for i, result in enumerate(self.results, 1):
             if prev_value is not None and prev_value != result["value"]:
                 rank = i
@@ -107,7 +100,7 @@ class Test:
         if not self.results:
             print(" No results found")
             return
-            
+        
         result_count = min(result_count, len(self.results))
         
         # Print header
@@ -117,7 +110,6 @@ class Test:
         else:
             print(" Value           Filename")
             print(" -----           --------")
-        
         for result in self.results[:result_count]:
             if block_mode:
                 print(

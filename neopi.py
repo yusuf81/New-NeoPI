@@ -81,7 +81,8 @@ class Test:
         flag_list = []
         for res in self.results:
             if calculate_distance(res["value"], self.mean) > (DEVIATION_THRESH)*self.stddev:
-                if (self.high_is_bad and res["value"] > self.mean) or (not self.high_is_bad and res["value"] < self.mean):
+                if ((self.high_is_bad and res["value"] > self.mean) or 
+                        (not self.high_is_bad and res["value"] < self.mean)):
                     percentage = calculate_distance(res["value"], self.mean) / self.stddev if self.stddev > 0 else float("inf")
                     res["percentage"] = percentage
                     flag_list.append(res)
@@ -483,14 +484,14 @@ if __name__ == "__main__":
     parser.add_argument("-u", "--unicode", action="store_true", help="Skip over unicode-y/UTF'y files")
     parser.add_argument("-f", "--follow-links", action="store_true", help="Follow symbolic links")
     parser.add_argument(
-        "-m", "--alarm-mode",
+        "-m", "--alarm-mode", 
         type=float,
         help="Alarm mode outputs flags only files with high deviation"
     )
     parser.add_argument(
         "-b", "--block-mode",
         type=int,
-        help="Block mode calculates the tests selected for the specified block sizes in each file"
+        help="Block mode calculates the tests selected for the specified block sizes in each file" 
     )
 
     options = parser.parse_args()

@@ -47,9 +47,21 @@ def create_arg_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Run compression Test"
     )
-    parser.add_argument("-e", "--entropy", action="store_true", help="Run entropy Test")
-    parser.add_argument("-E", "--eval", action="store_true", help="Run signature test for the eval")
-    parser.add_argument("-l", "--longestword", action="store_true", help="Run longest word test")
+    parser.add_argument(
+        "-e", "--entropy",
+        action="store_true",
+        help="Run entropy Test"
+    )
+    parser.add_argument(
+        "-E", "--eval",
+        action="store_true",
+        help="Run signature test for the eval"
+    )
+    parser.add_argument(
+        "-l", "--longestword",
+        action="store_true",
+        help="Run longest word test"
+    )
     parser.add_argument("-i", "--ic", action="store_true", help="Run IC test")
     parser.add_argument("-s", "--signature", action="store_true", help="Run signature test")
     parser.add_argument("-S", "--supersignature", action="store_true", help="Run SUPER-signature test")
@@ -149,6 +161,34 @@ def print_results(tests: List[Test], rank_list: Dict[str, float], args: argparse
         for idx in range(count):
             print(f' {rank_sorted[idx][1]:>7}        {rank_sorted[idx][0]}')
 
+def process_files(args, tests, valid_regex) -> tuple:
+    """Process all files and collect results."""
+    locator = SearchFile(args.follow_links)
+    csv_array = []
+    csv_header = ["filename"]
+    file_count = 0
+    file_ignore_count = 0
+
+    # Setup CSV headers
+    for test in tests:
+        csv_header.append(test.__class__.__name__)
+        if args.block_mode:
+            csv_header.append("position")
+
+    # Process files
+    for data, filename in locator.search_file_path([args.directory], valid_regex):
+        if not data:
+            continue
+
+        csv_row = process_file(data, filename, tests, args)
+        if csv_row:
+            csv_array.append(csv_row)
+            file_count += 1
+        else:
+            file_ignore_count += 1
+
+    return csv_array, csv_header, file_count, file_ignore_count
+
 def main() -> int:
     """Main entry point for CLI."""
     print("""
@@ -173,42 +213,20 @@ def main() -> int:
         print("Error: No tests specified")
         return 1
 
-    # Initialize search
-    locator = SearchFile(args.follow_links)
-    csv_array = []
-    csv_header = ["filename"]
-    file_count = 0
-    file_ignore_count = 0
     rank_list: Dict[str, float] = {}
-
-    # Setup CSV headers
-    for test in tests:
-        csv_header.append(test.__class__.__name__)
-        if args.block_mode:
-            csv_header.append("position")
-
-    # Process files
-
     time_start = time.time()
-    for data, filename in locator.search_file_path([args.directory], valid_regex):
-        if not data:
-            continue
-
-        csv_row = process_file(data, filename, tests, args)
-        if csv_row:
-            csv_array.append(csv_row)
-            file_count += 1
-        else:
-            file_ignore_count += 1
+    
+    # Process all files
+    csv_array, csv_header, file_count, file_ignore_count = process_files(
+        args, tests, valid_regex
+    )
 
     # Write results
     if args.csv:
         write_csv(args.csv, csv_header, csv_array)
 
     # Print results
-    time_finish = time.time()
-    scan_time = time_finish - time_start
-
+    scan_time = time.time() - time_start
     print_summary(file_count, file_ignore_count, scan_time)
     print_results(tests, rank_list, args)
 

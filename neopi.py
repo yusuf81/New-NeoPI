@@ -1,32 +1,9 @@
 #!/usr/bin/env python3
+"""Entry point script for neopi."""
+from neopi.cli import main
 
-"""
-Utility to scan a file path for encrypted and obfuscated files.
-
-Originally created by:
-Ben Hagen (ben.hagen@neohapsis.com)
-Scott Behrens (scott.behrens@neohapsis.com)
-
-Date: 11/4/2010
-Modified for Python 3 compatibility
-"""
-
-import math
-import os
-import re
-import csv
-import zlib
-import time
-from collections import defaultdict
-import argparse
-from multiprocessing import Pool
-from functools import lru_cache
-
-# Globals
-SMALLEST = 1  # Smallest filesize to check in bytes
-DEVIATION_THRESH = 1.5  # percentage deviation before alarm will sound
-
-class Test:
+if __name__ == "__main__":
+    exit(main())
     """Base class for all tests"""
     def __init__(self):
         # high_is_bad means the higher the metric, the more suspicious it is

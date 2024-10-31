@@ -143,7 +143,7 @@ def main() -> int:
    yusuf81-modified-neopi
    """)
 
-    args = create_arg_parser().parse_args()
+    args = create_arg_parser()
 
     # Validate inputs
     if not os.path.exists(args.directory):

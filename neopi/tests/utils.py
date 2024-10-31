@@ -1,5 +1,4 @@
 """Utility functions for tests."""
-
 def decode_input(input_data):
     """Safely decode input data to UTF-8 string.
     

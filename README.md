@@ -1,18 +1,98 @@
-Readme for New-NeoPI
+# NeoPI - Enhanced Web Shell Detection Tool
 ====================
-#New-NeoPI
-This is a fork of NeoPI.
 
-#What's new in New-NeoPI
-1. Added an `alarm' mode which flags files as web shells. The command line option is -m, e.g. ./neopi.py -efAm 2 /var/www/ for sensitivity of 2
-2. Added a new block-level scanning mode which scans by block instead of file level. The command line option is -b, e.g. ./neopi.py -efAb 512 /var/www/
-3. Added a new statistical test called Character Frequency. The command line option is -F. This test is experimental and performs poorly.
+NeoPI is a Python-based utility for detecting obfuscated and encrypted content within text/script files, with a focus on identifying hidden web shells. It uses statistical analysis and pattern matching to flag suspicious files.
 
+## Features
 
-Original Readme from NeoPI
-==========================
+- Multiple detection methods:
+  - Shannon entropy analysis
+  - Index of Coincidence (IC) calculation
+  - Longest word/string detection
+  - Compression ratio analysis
+  - Signature-based pattern matching
+  - Eval usage detection
 
-#What is NeoPI?
+- Advanced scanning modes:
+  - Block-level scanning (`-b`) for granular analysis
+  - Alarm mode (`-m`) for automated flagging of suspicious files
+  - Unicode-aware scanning with UTF handling (`-u`)
+  - Symlink following support (`-f`)
+
+- Output options:
+  - Console output with ranked results
+  - CSV export support
+  - Detailed statistics and scan timing
+
+## Installation
+
+```bash
+git clone https://github.com/Neohapsis/NeoPI.git
+cd NeoPI
+```
+
+## Usage
+
+Basic usage:
+```bash
+./neopi.py [options] <start directory> [filename regex]
+```
+
+Common examples:
+```bash
+# Scan with all tests
+./neopi.py -a /var/www/
+
+# Scan PHP files with entropy and signature tests
+./neopi.py -es /var/www/ "\.php$"
+
+# Block-level scan with 512 byte blocks
+./neopi.py -ab 512 /var/www/
+
+# Alarm mode with 2.0 standard deviation threshold
+./neopi.py -am 2.0 /var/www/
+```
+
+### Command Line Options
+
+- `-a, --all`: Run all tests (entropy, longest word, IC, signatures)
+- `-e, --entropy`: Run entropy test
+- `-i, --ic`: Run Index of Coincidence test
+- `-l, --longestword`: Run longest word test
+- `-s, --signature`: Run basic signature test
+- `-S, --supersignature`: Run enhanced signature test
+- `-E, --eval`: Check specifically for eval() usage
+- `-z, --zlib`: Run compression ratio test
+- `-b BLOCKSIZE`: Enable block-level scanning
+- `-m THRESHOLD`: Enable alarm mode with deviation threshold
+- `-u`: Skip files with high Unicode content
+- `-f`: Follow symbolic links
+- `-c FILE`: Export results to CSV file
+
+## How It Works
+
+NeoPI employs multiple statistical and pattern-matching techniques to identify potentially malicious files:
+
+1. **Entropy Analysis**: Measures randomness in file content
+2. **Index of Coincidence**: Detects language patterns and obfuscation
+3. **Longest Word**: Identifies suspiciously long strings
+4. **Signature Matching**: Looks for known malicious patterns
+5. **Compression Analysis**: Checks data compressibility
+
+Results are ranked and scored to help prioritize investigation of suspicious files.
+
+## Original Authors
+
+- Ben Hagen (ben.hagen@neohapsis.com)
+- Scott Behrens (scott.behrens@neohapsis.com)
+
+## License
+
+See LICENSE file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit pull requests.
 NeoPI is a Python script that uses a variety of statistical methods to detect obfuscated and encrypted content within text/script files. The intended purpose of NeoPI is to aid in the detection of hidden web shell code. The development focus of NeoPI was creating a tool that could be used in conjunction with other established detection methods such as Linux Malware Detect or traditional signature/keyword based searches.
 
 NeoPI recursively scans through the file system from a base directory and will rank files based on the results of  a number of tests. It also presents a “general” score derived from file rankings within the individual tests.

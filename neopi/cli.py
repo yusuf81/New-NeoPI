@@ -7,7 +7,7 @@ import time
 import csv
 from .search import SearchFile
 from .tests import (
-    LanguageIC, Entropy, LongestWord, 
+    LanguageIC, Entropy, LongestWord,
     SignatureNasty, SignatureSuperNasty, UsesEval,
     Compression
 )
@@ -17,9 +17,22 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Utility to scan a file path for encrypted and obfuscated files"
     )
-    parser.add_argument("directory", help="Start directory")
-    parser.add_argument("regex", nargs="?", help="Filename regex", default=".*")
-    parser.add_argument("-c", "--csv", help="Generate CSV outfile", metavar="FILECSV")
+    parser.add_argument(
+        "directory",
+        help="Start directory"
+    )
+    parser.add_argument(
+        "regex",
+        nargs="?",
+        help="Filename regex",
+        default=".*"
+    )
+    parser.add_argument(
+        "-c",
+        "--csv",
+        help="Generate CSV outfile",
+        metavar="FILECSV"
+    )
     parser.add_argument("-a", "--all", action="store_true",
                        help="Run all (useful) tests [Entropy, Longest Word, IC, Signature]")
     parser.add_argument("-z", "--zlib", action="store_true", help="Run compression Test")
@@ -70,8 +83,8 @@ def get_tests(args):
 
 def write_csv(filename, header, rows):
     """Write results to CSV file."""
-    with open(filename, "w", newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
+    with open(filename, "w", newline='', encoding='utf-8') as csv_file:
+        writer = csv.writer(csv_file)
         writer.writerow(header)
         writer.writerows(rows)
 
@@ -116,7 +129,6 @@ def main():
             continue
 
         csv_row = [filename]
-        
         if args.unicode:
             try:
                 text_data = data.decode('utf-8')
@@ -164,7 +176,7 @@ def main():
         rank_sorted = sorted(rank_list.items(), key=lambda x: x[1])
         print("\n[[ Top cumulative ranked files ]]")
         count = min(10, len(rank_sorted))
-        for x in range(count):
-            print(f' {rank_sorted[x][1]:>7}        {rank_sorted[x][0]}')
+        for idx in range(count):
+            print(f' {rank_sorted[idx][1]:>7}        {rank_sorted[idx][0]}')
 
     return 0

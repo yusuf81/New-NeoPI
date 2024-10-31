@@ -79,10 +79,17 @@ class Test:
 
     def sort(self):
         """Sort results by value and add ranking."""
+        # Filter out results with None values
+        self.results = [r for r in self.results if r["value"] is not None]
+        
+        if not self.results:
+            return
+            
         self.results.sort(
             key=lambda x: x["value"],
             reverse=self.high_is_bad
         )
+        
         rank = 1
         prev_value = None
         
@@ -97,13 +104,25 @@ class Test:
         test_name = self.__class__.__name__
         print(f"\n[[ Top {result_count} {test_name} results ]]")
         
+        if not self.results:
+            print(" No results found")
+            return
+            
         result_count = min(result_count, len(self.results))
+        
+        # Print header
+        if block_mode:
+            print(" Value      Position           Filename")
+            print(" -----      --------           --------")
+        else:
+            print(" Value           Filename")
+            print(" -----           --------")
         
         for result in self.results[:result_count]:
             if block_mode:
                 print(
                     f' {result["value"]:>7.4f}   '
-                    f'at byte number:{result["position"]}     '
+                    f'at byte {result["position"]:<8}     '
                     f'{result["filename"]}'
                 )
             else:

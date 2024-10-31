@@ -9,12 +9,12 @@ class SignatureNasty(Test):
         """Check for suspicious patterns."""
         if not input_data:
             return 0
-            
+        
         try:
             data = input_data.decode('utf-8', errors='ignore')
-        except:
+        except UnicodeError:
             return 0
-            
+        
         score = 0
         patterns = [
             r'chr\(.*?\)',

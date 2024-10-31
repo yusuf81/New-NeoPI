@@ -146,8 +146,6 @@ class LanguageIC(Test):
 
     def sort(self):
         """Sort results by value and add ranking."""
-        """Sort results by match count in descending order."""
-        """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
 
@@ -473,7 +471,8 @@ if __name__ == "__main__":
     parser.add_argument("directory", help="Start directory")
     parser.add_argument("regex", nargs="?", help="Filename regex", default=".*")
     parser.add_argument("-c", "--csv", help="Generate CSV outfile", metavar="FILECSV")
-    parser.add_argument("-a", "--all", action="store_true", help="Run all (useful) tests [Entropy, Longest Word, IC, Signature]")
+    parser.add_argument("-a", "--all", action="store_true", 
+                       help="Run all (useful) tests [Entropy, Longest Word, IC, Signature]")
     parser.add_argument("-z", "--zlib", action="store_true", help="Run compression Test")
     parser.add_argument("-e", "--entropy", action="store_true", help="Run entropy Test")
     parser.add_argument("-E", "--eval", action="store_true", help="Run signature test for the eval")

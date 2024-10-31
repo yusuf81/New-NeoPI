@@ -81,7 +81,7 @@ class Test:
         flag_list = []
         for res in self.results:
             if calculate_distance(res["value"], self.mean) > (DEVIATION_THRESH)*self.stddev:
-                if ((self.high_is_bad and res["value"] > self.mean) or 
+                if ((self.high_is_bad and res["value"] > self.mean) or
                         (not self.high_is_bad and res["value"] < self.mean)):
                     percentage = calculate_distance(res["value"], self.mean) / self.stddev if self.stddev > 0 else float("inf")
                     res["percentage"] = percentage
@@ -146,11 +146,13 @@ class LanguageIC(Test):
         return coincidence_index
 
     def sort(self):
+        """Sort results by match count in descending order."""
         """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
 
     def printer(self, result_count):
+        """Print top signature match results."""
         """Print top results up to specified count."""
         self.calculate_ic()
         print("\n[[ Average IC for Search ]]")
@@ -472,7 +474,7 @@ if __name__ == "__main__":
     parser.add_argument("directory", help="Start directory")
     parser.add_argument("regex", nargs="?", help="Filename regex", default=".*")
     parser.add_argument("-c", "--csv", help="Generate CSV outfile", metavar="FILECSV")
-    parser.add_argument("-a", "--all", action="store_true", 
+    parser.add_argument("-a", "--all", action="store_true",
                        help="Run all (useful) tests [Entropy, Longest Word, IC, Signature]")
     parser.add_argument("-z", "--zlib", action="store_true", help="Run compression Test")
     parser.add_argument("-e", "--entropy", action="store_true", help="Run entropy Test")
@@ -491,7 +493,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-b", "--block-mode",
         type=int,
-        help="Block mode calculates the tests selected for the specified block sizes in each file" 
+        help="Block mode calculates the tests selected for the specified block sizes in each file"
     )
 
     options = parser.parse_args()

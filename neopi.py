@@ -220,6 +220,7 @@ class LongestWord(Test):
         self.high_is_bad = True
 
     def calculate(self, input_data, filepath):
+        """Calculate longest word length in input data."""
         if not input_data:
             return 0
         try:
@@ -235,7 +236,7 @@ class LongestWord(Test):
         return longest
 
     def sort(self):
-        """Sort results by word length in descending order."""
+        """Sort results by word length in descending order and add ranking."""
         self.results.sort(key=lambda item: item["value"], reverse=True)
         self.results = results_add_rank(self.results)
 
@@ -351,10 +352,10 @@ class UsesEval(Test):
         if not data:
             return 0
         try:
-            text_data = data.decode('utf-8', errors='ignore')
+            decoded_text = data.decode('utf-8', errors='ignore')
         except (UnicodeDecodeError, ValueError):
             return 0
-        matches = re.findall(r'(eval\(\$(\w|\d))', text_data, re.I)
+        matches = re.findall(r'(eval\(\$(\w|\d))', decoded_text, re.I)
         if not options.block_mode:
             self.results.append({"filename": filename, "value": len(matches)})
         return len(matches)
@@ -412,7 +413,11 @@ class Compression(Test):
                 print(f' {self.results[idx]["value"]:>7.4f}        {self.results[idx]["filename"]}')
         if options.block_mode:
             for idx in range(result_count):
-                print(f' {self.results[idx]["value"]:>7.4f}   at byte number:{self.results[idx]["position"]}     {self.results[idx]["filename"]}')
+                print(
+                    f' {self.results[idx]["value"]:>7.4f}   '
+                    f'at byte number:{self.results[idx]["position"]}     '
+                    f'{self.results[idx]["filename"]}'
+                )
 
 def results_add_rank(results):
     """Add ranking to sorted results list."""

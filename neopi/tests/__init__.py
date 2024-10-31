@@ -8,6 +8,7 @@ This module provides various test classes for analyzing files:
 """
 
 from .base import Test
+from .utils import decode_input
 from .entropy import Entropy
 from .language import LanguageIC
 from .compression import Compression

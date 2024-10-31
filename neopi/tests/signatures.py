@@ -1,18 +1,15 @@
 """Signature-based tests implementation."""
 import re
 from .base import Test
+from .utils import decode_input
 
 class SignatureNasty(Test):
     """Test for suspicious code patterns."""
 
     def calculate(self, input_data, filepath):
         """Check for suspicious patterns."""
-        if not input_data:
-            return 0
-
-        try:
-            data = input_data.decode('utf-8', errors='ignore')
-        except UnicodeError:
+        data = decode_input(input_data)
+        if data is None:
             return 0
 
         score = 0

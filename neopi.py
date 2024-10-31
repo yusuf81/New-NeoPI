@@ -145,7 +145,6 @@ class LanguageIC(Test):
         return coincidence_index
 
     def sort(self):
-        """Sort results by match count in descending order."""
         """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)

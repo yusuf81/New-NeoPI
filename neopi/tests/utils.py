@@ -6,7 +6,7 @@ def decode_input(input_data):
         Decoded string or None if decoding fails or input is empty
     """
     if not input_data:
-        return None        
+        return None
     try:
         return input_data.decode('utf-8', errors='ignore')
     except UnicodeError:

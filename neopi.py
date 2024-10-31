@@ -146,12 +146,12 @@ class LanguageIC(Test):
 
     def sort(self):
         """Sort results by value and add ranking."""
+        """Sort results by match count in descending order."""
+        """Sort results by value and add ranking."""
         self.results.sort(key=lambda item: item["value"])
         self.results = results_add_rank(self.results)
 
     def printer(self, result_count):
-        """Print top results up to specified count."""
-        """Print top signature match results."""
         """Print top results up to specified count."""
         self.calculate_ic()
         print("\n[[ Average IC for Search ]]")

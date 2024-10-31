@@ -227,7 +227,7 @@ class LongestWord(Test):
         except (UnicodeDecodeError, ValueError):
             return 0
         longest = 0
-        words = re.split(r"[\s,\n,\r]", text_data)
+        words = re.split(r"[\s,\n,\r]", decoded_data)
         if words:
             longest = max(len(word) for word in words)
         if not options.block_mode:

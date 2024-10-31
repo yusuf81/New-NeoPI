@@ -463,20 +463,24 @@ class SearchFile:
             print(f"Could not read file :: {filepath}")
             return None
 
+    def process_file(self, filepath, pattern):
+        """Process a single file."""
+        if not pattern.search(os.path.basename(filepath)) or os.path.getsize(filepath) <= SMALLEST:
+            return None
+        file_data = self.read_file(filepath)
+        if file_data:
+            return file_data, filepath
+        return None
+
     def search_file_path(self, args, pattern):
         """Search files in path matching regex pattern."""
-        def process_file(filepath):
-            if not pattern.search(os.path.basename(filepath)) or os.path.getsize(filepath) <= SMALLEST:
-                return None
-            file_data = self.read_file(filepath)
-            if file_data:
-                return file_data, filepath
-            return None
-
         with Pool() as pool:
             for root, _, files in os.walk(args[0], followlinks=self.follow_symlinks):
                 filepaths = [os.path.join(root, f) for f in files]
-                for result in pool.imap_unordered(process_file, filepaths):
+                for result in pool.imap_unordered(
+                    lambda x: self.process_file(x, pattern),
+                    filepaths
+                ):
                     if result:
                         yield result
 

@@ -5,18 +5,22 @@ import os
 import re
 import time
 import csv
+from typing import List, Dict, Any, Tuple
 from .search import SearchFile
 from .tests import (
+    Test,
     LanguageIC, Entropy, LongestWord,
     SignatureNasty, SignatureSuperNasty, UsesEval,
     Compression
 )
 
-def parse_args():
-    """Parse command line arguments."""
+def create_arg_parser() -> argparse.ArgumentParser:
+    """Create and configure argument parser."""
     parser = argparse.ArgumentParser(
         description="Utility to scan a file path for encrypted and obfuscated files"
     )
+    
+    # Required arguments
     parser.add_argument(
         "directory",
         help="Start directory"
@@ -56,112 +60,66 @@ def parse_args():
     )
     return parser.parse_args()
 
-def get_tests(args):
+def get_tests(args: argparse.Namespace) -> List[Test]:
     """Get list of tests to run based on arguments."""
+    test_map = {
+        'entropy': Entropy,
+        'longestword': LongestWord,
+        'ic': LanguageIC,
+        'signature': SignatureNasty,
+        'supersignature': SignatureSuperNasty,
+        'eval': UsesEval,
+        'zlib': Compression
+    }
+    
     tests = []
+    
     if args.all:
         tests.extend([
             LanguageIC(), Entropy(), LongestWord(),
             SignatureNasty(), SignatureSuperNasty()
         ])
-    else:
-        if args.entropy:
-            tests.append(Entropy())
-        if args.longestword:
-            tests.append(LongestWord())
-        if args.ic:
-            tests.append(LanguageIC())
-        if args.signature:
-            tests.append(SignatureNasty())
-        if args.supersignature:
-            tests.append(SignatureSuperNasty())
-        if args.eval:
-            tests.append(UsesEval())
-        if args.zlib:
-            tests.append(Compression())
+        return tests
+        
+    for arg_name, test_class in test_map.items():
+        if getattr(args, arg_name, False):
+            tests.append(test_class())
+            
     return tests
 
-def write_csv(filename, header, rows):
+def write_csv(filename: str, header: List[str], rows: List[List[Any]]) -> None:
     """Write results to CSV file."""
     with open(filename, "w", newline='', encoding='utf-8') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(header)
         writer.writerows(rows)
 
-def main():
-    """Main entry point for CLI."""
-    print("""
-   yusuf81-modified-neopi
-   """)
+def process_file(data: bytes, filename: str, tests: List[Test], args: argparse.Namespace) -> List[Any]:
+    """Process a single file with all tests."""
+    if args.unicode:
+        try:
+            text_data = data.decode('utf-8')
+            ascii_high_count = sum(1 for c in text_data if ord(c) > 127)
+            file_ascii_ratio = float(ascii_high_count) / float(len(text_data))
+            if file_ascii_ratio >= 0.1:
+                return []
+        except (UnicodeDecodeError, ValueError):
+            pass
 
-    args = parse_args()
-
-    if not os.path.exists(args.directory):
-        print("Error: Invalid path")
-        return 1
-
-    try:
-        valid_regex = re.compile(args.regex)
-    except re.error:
-        print("Error: Invalid regular expression")
-        return 1
-
-    tests = get_tests(args)
-    if not tests:
-        print("Error: No tests specified")
-        return 1
-
-    locator = SearchFile(args.follow_links)
-    csv_array = []
-    csv_header = ["filename"]
-
-    file_count = 0
-    file_ignore_count = 0
-    time_start = time.time()
-
+    csv_row = [filename]
+    
     for test in tests:
-        csv_header.append(test.__class__.__name__)
         if args.block_mode:
-            csv_header.append("position")
+            result = test.block_calculate(args.block_mode, data, filename)
+            csv_row.extend([result["value"], result["position"]])
+        else:
+            result = test.calculate(data, filename)
+            csv_row.append(result)
+            
+    return csv_row
 
-    for data, filename in locator.search_file_path([args.directory], valid_regex):
-        if not data:
-            continue
-
-        csv_row = [filename]
-        if args.unicode:
-            try:
-                text_data = data.decode('utf-8')
-                ascii_high_count = sum(1 for c in text_data if ord(c) > 127)
-                file_ascii_ratio = float(ascii_high_count) / float(len(text_data))
-                if file_ascii_ratio >= 0.1:
-                    file_ignore_count += 1
-                    continue
-            except (UnicodeDecodeError, ValueError):
-                pass
-
-        for test in tests:
-            if args.block_mode:
-                result = test.block_calculate(args.block_mode, data, filename)
-                csv_row.extend([result["value"], result["position"]])
-            else:
-                result = test.calculate(data, filename)
-                csv_row.append(result)
-        
-        csv_array.append(csv_row)
-        file_count += 1
-
-    if args.csv:
-        write_csv(args.csv, csv_header, csv_array)
-
-    time_finish = time.time()
-    scan_time = time_finish - time_start
-
-    print(f"\n[[ Total files scanned: {file_count} ]]")
-    print(f"[[ Total files ignored: {file_ignore_count} ]]")
-    print(f"[[ Scan Time: {scan_time:.2f} seconds ]]")
-
-    rank_list = {}
+def print_results(tests: List[Test], rank_list: Dict[str, float], args: argparse.Namespace) -> None:
+    """Print test results and rankings."""
     for test in tests:
         if args.alarm_mode:
             print(f"Flagged files for: {test.__class__.__name__}")
@@ -178,5 +136,72 @@ def main():
         count = min(10, len(rank_sorted))
         for idx in range(count):
             print(f' {rank_sorted[idx][1]:>7}        {rank_sorted[idx][0]}')
+
+def main() -> int:
+    """Main entry point for CLI."""
+    print("""
+   yusuf81-modified-neopi
+   """)
+
+    args = create_arg_parser().parse_args()
+
+    # Validate inputs
+    if not os.path.exists(args.directory):
+        print("Error: Invalid path")
+        return 1
+
+    try:
+        valid_regex = re.compile(args.regex)
+    except re.error:
+        print("Error: Invalid regular expression")
+        return 1
+
+    tests = get_tests(args)
+    if not tests:
+        print("Error: No tests specified")
+        return 1
+
+    # Initialize search
+    locator = SearchFile(args.follow_links)
+    csv_array = []
+    csv_header = ["filename"]
+    file_count = 0
+    file_ignore_count = 0
+    rank_list: Dict[str, float] = {}
+
+    # Setup CSV headers
+    for test in tests:
+        csv_header.append(test.__class__.__name__)
+        if args.block_mode:
+            csv_header.append("position")
+
+    # Process files
+    time_start = time.time()
+    
+    for data, filename in locator.search_file_path([args.directory], valid_regex):
+        if not data:
+            continue
+            
+        csv_row = process_file(data, filename, tests, args)
+        if csv_row:
+            csv_array.append(csv_row)
+            file_count += 1
+        else:
+            file_ignore_count += 1
+
+    # Write results
+    if args.csv:
+        write_csv(args.csv, csv_header, csv_array)
+
+    # Print summary
+    time_finish = time.time()
+    scan_time = time_finish - time_start
+
+    print(f"\n[[ Total files scanned: {file_count} ]]")
+    print(f"[[ Total files ignored: {file_ignore_count} ]]")
+    print(f"[[ Scan Time: {scan_time:.2f} seconds ]]")
+
+    # Print detailed results
+    print_results(tests, rank_list, args)
 
     return 0

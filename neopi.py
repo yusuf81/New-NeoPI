@@ -421,11 +421,11 @@ def results_add_rank(results):
     previous_value = False
     new_list = []
     for result in results:
-        if previous_value and previous_value != file["value"]:
+        if previous_value and previous_value != result["value"]:
             rank = offset
-        file["rank"] = rank
-        new_list.append(file)
-        previous_value = file["value"]
+        result["rank"] = rank
+        new_list.append(result)
+        previous_value = result["value"]
         offset = offset + 1
     return new_list
 

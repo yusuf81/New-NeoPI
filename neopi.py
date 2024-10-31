@@ -472,15 +472,19 @@ class SearchFile:
             return file_data, filepath
         return None
 
+    def _process_file_wrapper(self, args):
+        """Wrapper function for process_file to make it pickleable"""
+        filepath, pattern = args
+        return self.process_file(filepath, pattern)
+
     def search_file_path(self, args, pattern):
         """Search files in path matching regex pattern."""
         with Pool() as pool:
             for root, _, files in os.walk(args[0], followlinks=self.follow_symlinks):
                 filepaths = [os.path.join(root, f) for f in files]
-                for result in pool.imap_unordered(
-                    lambda x: self.process_file(x, pattern),
-                    filepaths
-                ):
+                # Create tuples of (filepath, pattern) for each file
+                work_items = [(f, pattern) for f in filepaths]
+                for result in pool.imap_unordered(self._process_file_wrapper, work_items):
                     if result:
                         yield result
 

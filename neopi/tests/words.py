@@ -20,4 +20,6 @@ class LongestWord(Test):
         if not words:
             return 0
             
-        return len(max(words, key=len))
+        longest = len(max(words, key=len)) if words else 0
+        self.results.append({"filename": filepath, "value": longest})
+        return longest

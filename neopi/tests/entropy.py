@@ -22,4 +22,6 @@ class Entropy(Test):
             probability = float(count) / length
             entropy -= probability * math.log2(probability)
             
+        # Append result
+        self.results.append({"filename": filepath, "value": entropy})
         return entropy

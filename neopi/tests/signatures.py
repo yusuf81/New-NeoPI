@@ -29,6 +29,8 @@ class SignatureNasty(Test):
             matches = re.findall(pattern, data)
             score += len(matches)
             
+        self.results.append({"filename": filepath, "value": score})
+        self.results.append({"filename": filepath, "value": score})
         return score
 
 class SignatureSuperNasty(Test):
@@ -74,4 +76,6 @@ class UsesEval(Test):
             return 0
             
         matches = re.findall(r'eval\s*\(', data)
-        return len(matches)
+        score = len(matches)
+        self.results.append({"filename": filepath, "value": score})
+        return score

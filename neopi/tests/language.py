@@ -28,4 +28,5 @@ class LanguageIC(Test):
             ic += count * (count - 1)
             
         ic = float(ic) / (length * (length - 1)) if length > 1 else 0
+        self.results.append({"filename": filepath, "value": ic})
         return ic

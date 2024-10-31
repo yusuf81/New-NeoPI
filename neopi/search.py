@@ -1,7 +1,6 @@
 """File search functionality."""
 
 import os
-import re
 from functools import lru_cache
 from multiprocessing import Pool
 

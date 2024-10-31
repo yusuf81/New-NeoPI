@@ -3,6 +3,8 @@
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
+neopi/__pycache__/
+neopi/test/__pycache__/
 *.py[cod]
 *$py.class
 

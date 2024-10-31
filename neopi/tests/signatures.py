@@ -4,17 +4,17 @@ from .base import Test
 
 class SignatureNasty(Test):
     """Test for suspicious code patterns."""
-    
+
     def calculate(self, input_data, filepath):
         """Check for suspicious patterns."""
         if not input_data:
             return 0
-        
+
         try:
             data = input_data.decode('utf-8', errors='ignore')
         except UnicodeError:
             return 0
-        
+
         score = 0
         patterns = [
             r'chr\(.*?\)',
@@ -37,12 +37,12 @@ class SignatureSuperNasty(Test):
         """Check for highly suspicious patterns."""
         if not input_data:
             return 0
-        
+
         try:
             data = input_data.decode('utf-8', errors='ignore')
         except UnicodeError:
             return 0
-        
+
         score = 0
         patterns = [
             r'system\(',
@@ -63,12 +63,12 @@ class UsesEval(Test):
         """Check for eval() usage."""
         if not input_data:
             return 0
-        
+
         try:
             data = input_data.decode('utf-8', errors='ignore')
         except UnicodeError:
             return 0
-        
+
         matches = re.findall(r'eval\s*\(', data)
         score = len(matches)
         self.results.append({"filename": filepath, "value": score})

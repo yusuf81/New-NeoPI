@@ -4,7 +4,6 @@ from .base import Test
 
 class LanguageIC(Test):
     """Calculate Index of Coincidence for language detection."""
-
     def __init__(self):
         super().__init__()
         self.high_is_bad = False

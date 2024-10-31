@@ -86,7 +86,7 @@ def get_tests(args: argparse.Namespace) -> List[Test]:
             SignatureNasty(), SignatureSuperNasty()
         ])
         return tests
-        
+
     for arg_name, test_class in test_map.items():
         if getattr(args, arg_name, False):
             tests.append(test_class())
@@ -113,7 +113,7 @@ def process_file(data: bytes, filename: str, tests: List[Test], args: argparse.N
             pass
 
     csv_row = [filename]
-    
+
     for test in tests:
         if args.block_mode:
             result = test.block_calculate(args.block_mode, data, filename)
@@ -121,7 +121,7 @@ def process_file(data: bytes, filename: str, tests: List[Test], args: argparse.N
         else:
             result = test.calculate(data, filename)
             csv_row.append(result)
-            
+
     return csv_row
 
 def print_summary(file_count: int, file_ignore_count: int, scan_time: float) -> None:
@@ -193,7 +193,7 @@ def main() -> int:
     for data, filename in locator.search_file_path([args.directory], valid_regex):
         if not data:
             continue
-            
+
         csv_row = process_file(data, filename, tests, args)
         if csv_row:
             csv_array.append(csv_row)
@@ -208,7 +208,7 @@ def main() -> int:
     # Print results
     time_finish = time.time()
     scan_time = time_finish - time_start
-    
+
     print_summary(file_count, file_ignore_count, scan_time)
     print_results(tests, rank_list, args)
 

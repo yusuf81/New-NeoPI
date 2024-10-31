@@ -17,7 +17,7 @@ from .words import LongestWord
 __all__ = [
     'Test',
     'Entropy',
-    'LanguageIC', 
+    'LanguageIC',
     'Compression',
     'SignatureNasty',
     'SignatureSuperNasty',

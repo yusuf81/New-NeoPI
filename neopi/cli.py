@@ -64,8 +64,8 @@ def create_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("-i", "--ic", action="store_true", help="Run IC test")
     parser.add_argument("-s", "--signature", action="store_true", help="Run signature test")
-    parser.add_argument("-S", "--supersignature", action="store_true", help="Run SUPER-signature test")
-    parser.add_argument("-u", "--unicode", action="store_true", help="Skip over unicode-y/UTF'y files")
+    parser.add_argument("-S", "--supersignature", action="store_true", help="Run SUPER-signature")
+    parser.add_argument("-u", "--unicode", action="store_true", help="Skip over unicode-y/UTF'y")
     parser.add_argument("-f", "--follow-links", action="store_true", help="Follow symbolic links")
     parser.add_argument(
         "-m", "--alarm-mode",
@@ -112,7 +112,7 @@ def write_csv(filename: str, header: List[str], rows: List[List[Any]]) -> None:
         writer.writerow(header)
         writer.writerows(rows)
 
-def process_file(data: bytes, filename: str, tests: List[Test], args: argparse.Namespace) -> List[Any]:
+def process_file(data: bytes, filename: str, tests: List[Test],args: argparse.Namespace)->List[Any]:
     """Process a single file with all tests."""
     if args.unicode:
         try:
@@ -215,7 +215,6 @@ def main() -> int:
 
     rank_list: Dict[str, float] = {}
     time_start = time.time()
-    
     # Process all files
     csv_array, csv_header, file_count, file_ignore_count = process_files(
         args, tests, valid_regex

@@ -27,30 +27,39 @@ NeoPI is a Python-based utility for detecting obfuscated and encrypted content w
 ## Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/Neohapsis/NeoPI.git
 cd NeoPI
+
+# Install as a Python package
+pip install -e .
 ```
 
 ## Usage
 
-Basic usage:
+NeoPI can be run either as a module or using the wrapper script:
+
 ```bash
+# Run as Python module
+python -m neopi [options] <start directory> [filename regex]
+
+# Or use the wrapper script
 ./neopi.py [options] <start directory> [filename regex]
 ```
 
 Common examples:
 ```bash
 # Scan with all tests
-./neopi.py -a /var/www/
+python -m neopi -a /var/www/
 
 # Scan PHP files with entropy and signature tests
-./neopi.py -es /var/www/ "\.php$"
+python -m neopi -es /var/www/ "\.php$"
 
 # Block-level scan with 512 byte blocks
-./neopi.py -ab 512 /var/www/
+python -m neopi -ab 512 /var/www/
 
 # Alarm mode with 2.0 standard deviation threshold
-./neopi.py -am 2.0 /var/www/
+python -m neopi -am 2.0 /var/www/
 ```
 
 ### Command Line Options
